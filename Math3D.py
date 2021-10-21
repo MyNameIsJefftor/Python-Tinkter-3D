@@ -1,17 +1,17 @@
 from __future__ import annotations
-import math as math
+
 
 class vec3():
-    def __init__(self, x :float = 0, y :float = 0, z :float = 0) -> None:
-        self.array = [x,y,z]
+    def __init__(self, x: float = 0, y: float = 0, z: float = 0) -> None:
+        self.array = [x, y, z]
 
-    def x(self)->float:
+    def x(self) -> float:
         return self.array[0]
 
-    def y(self)->float:
+    def y(self) -> float:
         return self.array[1]
 
-    def z(self)->float:
+    def z(self) -> float:
         return self.array[2]
 
     def __getitem__(self, key):
@@ -28,20 +28,23 @@ class vec3():
                 return False
         return True
 
-class vec4():
-    def __init__(self, x :float = 0.0, y :float = 0, z :float = 0, w :float= 0) -> None:
-        self.array = [x,y,z,w]
 
-    def x(self)->float:
+class vec4():
+    def __init__(self,
+                 x: float = 0.0, y: float = 0, z: float = 0,
+                 w: float = 0) -> None:
+        self.array = [x, y, z, w]
+
+    def x(self) -> float:
         return self.array[0]
 
-    def y(self)->float:
+    def y(self) -> float:
         return self.array[1]
 
-    def z(self)->float:
+    def z(self) -> float:
         return self.array[2]
 
-    def w(self)->float:
+    def w(self) -> float:
         return self.array[3]
 
     def __getitem__(self, key):
@@ -58,61 +61,49 @@ class vec4():
                 return False
         return True
 
-    def __mul__(self, other: Mat3x3)->vec4:
+    def __mul__(self, other: Mat3x3) -> vec4:
         if isinstance(other, Mat3x3):
-            mat3 = Mat3x3(other)
             storage = vec4()
-            storage.array[0] = self.array[0]*mat3.matrix[0][0]+self.array[1]*mat3.matrix[0][1]+self.array[2]*mat3.matrix[0][2]
-            storage.array[1] = self.array[0]*mat3.matrix[1][0]+self.array[1]*mat3.matrix[1][1]+self.array[2]*mat3.matrix[1][2]
-            storage.array[2] = self.array[0]*mat3.matrix[2][0]+self.array[1]*mat3.matrix[2][1]+self.array[2]*mat3.matrix[2][2]
-            storage.array[3] = self.array[3]
+            for y in range(0, 3):
+                for x in range(0, 3):
+                    storage[y] = storage[y] + self[y] * other[x][y]
+            storage[3] = self.w()
             return storage
 
         if isinstance(other, Mat4x4):
-            mat3 = Mat4x4(other)
             storage = vec4()
-            storage.array[0] = self.array[0]*mat3.matrix[0][0]+self.array[1]*mat3.matrix[0][1]+self.array[2]*mat3.matrix[0][2]+self.array[3]*mat3.matrix[0][3]
-            storage.array[1] = self.array[0]*mat3.matrix[1][0]+self.array[1]*mat3.matrix[1][1]+self.array[2]*mat3.matrix[1][2]+self.array[3]*mat3.matrix[1][3]
-            storage.array[2] = self.array[0]*mat3.matrix[2][0]+self.array[1]*mat3.matrix[2][1]+self.array[2]*mat3.matrix[2][2]+self.array[3]*mat3.matrix[2][3]
-            storage.array[3] = self.array[0]*mat3.matrix[3][0]+self.array[1]*mat3.matrix[3][1]+self.array[2]*mat3.matrix[3][2]+self.array[3]*mat3.matrix[3][3]
+            for y in range(0, 4):
+                for x in range(0, 4):
+                    storage[y] = storage[y] + self[y] * other[x][y]
             return storage
 
         return None
 
 
-
-# row x column
+# each vector is a row
 class Mat3x3():
-    def __init__(self, array = [vec3(1,0,0),vec3(0,1,0),vec3(0,0,1)]) -> None:
+    def __init__(self, array=[vec3(1, 0, 0),
+                              vec3(0, 1, 0),
+                              vec3(0, 0, 1)]) -> None:
         self.matrix = array
 
     def __getitem__(self, key):
         return self.matrix[key]
 
-    def __mul__(self,other : Mat3x3) -> Mat3x3:
+    def __mul__(self, other: Mat3x3) -> Mat3x3:
 
         if not isinstance(other, Mat3x3):
             return None
-        output = Mat3x3(array=[vec3(),vec3(),vec3()])
 
-        # top row
-        output.matrix[0][0] = self.matrix[0][0]*other.matrix[0][0]+self.matrix[0][1]*other.matrix[1][0]+self.matrix[0][2]*other.matrix[2][0]
-        output.matrix[0][1] = self.matrix[0][0]*other.matrix[0][1]+self.matrix[0][1]*other.matrix[1][1]+self.matrix[0][2]*other.matrix[2][1]
-        output.matrix[0][2] = self.matrix[0][0]*other.matrix[0][2]+self.matrix[0][1]*other.matrix[1][2]+self.matrix[0][2]*other.matrix[2][2]
-
-        # middle row
-        output.matrix[1][0] = self.matrix[1][0]*other.matrix[0][0]+self.matrix[1][1]*other.matrix[1][0]+self.matrix[1][2]*other.matrix[2][0]
-        output.matrix[1][1] = self.matrix[1][0]*other.matrix[0][1]+self.matrix[1][1]*other.matrix[1][1]+self.matrix[1][2]*other.matrix[2][1]
-        output.matrix[1][2] = self.matrix[1][0]*other.matrix[0][2]+self.matrix[1][1]*other.matrix[1][2]+self.matrix[1][2]*other.matrix[2][2]
-
-        # bottom row
-        output.matrix[2][0] = self.matrix[2][0]*other.matrix[0][0]+self.matrix[2][1]*other.matrix[1][0]+self.matrix[2][2]*other.matrix[2][0]
-        output.matrix[2][1] = self.matrix[2][0]*other.matrix[0][1]+self.matrix[2][1]*other.matrix[1][1]+self.matrix[2][2]*other.matrix[2][1]
-        output.matrix[2][2] = self.matrix[2][0]*other.matrix[0][2]+self.matrix[2][1]*other.matrix[1][2]+self.matrix[2][2]*other.matrix[2][2]
+        output = Mat3x3(array=[vec3(), vec3(), vec3()])
+        for a in range(0, 3):
+            for b in range(0, 3):
+                for c in range(0, 3):
+                    output[a][b] = output[a][b] + self[a][c] * other[c][b]
 
         return output
 
-    def __eq__(self, other : Mat3x3) -> bool:
+    def __eq__(self, other: Mat3x3) -> bool:
         if not isinstance(other, Mat3x3):
             return False
         for i in range(len(self.matrix)):
@@ -122,11 +113,18 @@ class Mat3x3():
 
     __slots__ = ['matrix']
 
+
 class Mat4x4():
-    def __init__(self, array = [vec4(1,0,0,0),vec4(0,1,0,0),vec4(0,0,1,0),vec4(0,0,0,1)]) -> None:
+    def __init__(self, array=[vec4(1, 0, 0, 0),
+                              vec4(0, 1, 0, 0),
+                              vec4(0, 0, 1, 0),
+                              vec4(0, 0, 0, 1)]) -> None:
         self.matrix = array
 
-    def __eq__(self, other :Mat4x4) -> bool:
+    def __getitem__(self, key):
+        return self.matrix[key]
+
+    def __eq__(self, other: Mat4x4) -> bool:
         if not isinstance(other, Mat4x4):
             return False
         for i in range(len(self.matrix)):
@@ -134,34 +132,22 @@ class Mat4x4():
                 return False
         return True
 
-    def __mul__(self,other : Mat4x4) -> Mat4x4:
-        output = Mat4x4(array=[vec4(),vec4(),vec4(),vec4()])
-
-        # row 0
-        output.matrix[0][0] = self.matrix[0][0]*other.matrix[0][0]+self.matrix[0][1]*other.matrix[1][0]+self.matrix[0][2]*other.matrix[2][0]+self.matrix[0][3]*other.matrix[3][0]
-        output.matrix[0][1] = self.matrix[0][0]*other.matrix[0][1]+self.matrix[0][1]*other.matrix[1][1]+self.matrix[0][2]*other.matrix[2][1]+self.matrix[0][3]*other.matrix[3][1]
-        output.matrix[0][2] = self.matrix[0][0]*other.matrix[0][2]+self.matrix[0][1]*other.matrix[1][2]+self.matrix[0][2]*other.matrix[2][2]+self.matrix[0][3]*other.matrix[3][2]
-        output.matrix[0][3] = self.matrix[0][0]*other.matrix[0][3]+self.matrix[0][1]*other.matrix[1][3]+self.matrix[0][2]*other.matrix[2][3]+self.matrix[0][3]*other.matrix[3][3]
-
-        # row 1
-        output.matrix[1][0] = self.matrix[1][0]*other.matrix[0][0]+self.matrix[1][1]*other.matrix[1][0]+self.matrix[1][2]*other.matrix[2][0]+self.matrix[1][3]*other.matrix[3][0]
-        output.matrix[1][1] = self.matrix[1][0]*other.matrix[0][1]+self.matrix[1][1]*other.matrix[1][1]+self.matrix[1][2]*other.matrix[2][1]+self.matrix[1][3]*other.matrix[3][1]
-        output.matrix[1][2] = self.matrix[1][0]*other.matrix[0][2]+self.matrix[1][1]*other.matrix[1][2]+self.matrix[1][2]*other.matrix[2][2]+self.matrix[1][3]*other.matrix[3][2]
-        output.matrix[1][3] = self.matrix[1][0]*other.matrix[0][3]+self.matrix[1][1]*other.matrix[1][3]+self.matrix[1][2]*other.matrix[2][3]+self.matrix[1][3]*other.matrix[3][3]
-
-        # row 2
-        output.matrix[2][0] = self.matrix[2][0]*other.matrix[0][0]+self.matrix[2][1]*other.matrix[1][0]+self.matrix[2][2]*other.matrix[2][0]+self.matrix[2][3]*other.matrix[3][0]
-        output.matrix[2][1] = self.matrix[2][0]*other.matrix[0][1]+self.matrix[2][1]*other.matrix[1][1]+self.matrix[2][2]*other.matrix[2][1]+self.matrix[2][3]*other.matrix[3][1]
-        output.matrix[2][2] = self.matrix[2][0]*other.matrix[0][2]+self.matrix[2][1]*other.matrix[1][2]+self.matrix[2][2]*other.matrix[2][2]+self.matrix[2][3]*other.matrix[3][2]
-        output.matrix[2][3] = self.matrix[2][0]*other.matrix[0][3]+self.matrix[2][1]*other.matrix[1][3]+self.matrix[2][2]*other.matrix[2][3]+self.matrix[2][3]*other.matrix[3][3]
-
-        # row 3
-        output.matrix[3][0] = self.matrix[3][0]*other.matrix[0][0]+self.matrix[3][1]*other.matrix[1][0]+self.matrix[3][2]*other.matrix[2][0]+self.matrix[3][3]*other.matrix[3][0]
-        output.matrix[3][1] = self.matrix[3][0]*other.matrix[0][1]+self.matrix[3][1]*other.matrix[1][1]+self.matrix[3][2]*other.matrix[2][1]+self.matrix[3][3]*other.matrix[3][1]
-        output.matrix[3][2] = self.matrix[3][0]*other.matrix[0][2]+self.matrix[3][1]*other.matrix[1][2]+self.matrix[3][2]*other.matrix[2][2]+self.matrix[3][3]*other.matrix[3][2]
-        output.matrix[3][3] = self.matrix[3][0]*other.matrix[0][3]+self.matrix[3][1]*other.matrix[1][3]+self.matrix[3][2]*other.matrix[2][3]+self.matrix[3][3]*other.matrix[3][3]
-
+    def __mul__(self, other: Mat4x4) -> Mat4x4:
+        if not isinstance(other, Mat4x4):
+            return False
+        output = Mat4x4(array=[vec4(),
+                               vec4(),
+                               vec4(),
+                               vec4()])
+        for a in range(0, 4):
+            for b in range(0, 4):
+                for c in range(0, 4):
+                    output[a][b] = output[a][b] + self[a][c] * other[c][b]
         return output
 
     __slots__ = ["matrix"]
 
+
+class Calculator():
+    def __init__(self):
+        self
