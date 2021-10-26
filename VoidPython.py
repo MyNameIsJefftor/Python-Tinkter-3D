@@ -1,9 +1,22 @@
-from Math3D import Math3d
+import Math3D
+
+
+class Mesh():
+    def __init__(self):
+        self.points = [Math3D.Vec4()]
+        self.pairs = [Math3D.Vec3()]
+
+
+class Transform():
+    def __init__(self):
+        self.position = Math3D.Mat4x4()
+        self.rotation = Math3D.Mat4x4()
+        self.scale = Math3D.Vec3()
 
 
 class Camera:
     def __init__(self, position, nearPlane=1, farPlane=10) -> None:
-        self.matrix = Math3d.Mat3()
+        self.transform = None
         self.near = nearPlane
         self.far = farPlane
 
@@ -12,7 +25,7 @@ class Camera:
 
 class Object:
     def __init__(self) -> None:
-        self.Mesh = None
-        self.position = Math3d.mat4x4
+        self.mesh = None
+        self.transform = None
 
     __slots__ = ["Mesh", "Position"]

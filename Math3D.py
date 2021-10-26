@@ -1,7 +1,7 @@
 from __future__ import annotations
+from math import cos, sin, tan, radians
 
-
-class vec3():
+class Vec3():
     def __init__(self, x: float = 0, y: float = 0, z: float = 0) -> None:
         self.array = [x, y, z]
 
@@ -21,7 +21,7 @@ class vec3():
         self.array[key] = value
 
     def __eq__(self, other):
-        if not isinstance(other, vec3):
+        if not isinstance(other, Vec3):
             return False
         for i in range(len(self.array)):
             if self.array[i] != other.array[i]:
@@ -29,7 +29,7 @@ class vec3():
         return True
 
 
-class vec4():
+class Vec4():
     def __init__(self,
                  x: float = 0.0, y: float = 0, z: float = 0,
                  w: float = 0) -> None:
@@ -54,16 +54,16 @@ class vec4():
         self.array[key] = value
 
     def __eq__(self, other):
-        if not isinstance(other, vec4):
+        if not isinstance(other, Vec4):
             return False
         for i in range(4):
             if other.array[i] != self.array[i]:
                 return False
         return True
 
-    def __mul__(self, other: Mat3x3) -> vec4:
+    def __mul__(self, other: Mat3x3) -> Vec4:
         if isinstance(other, Mat3x3):
-            storage = vec4()
+            storage = Vec4()
             for y in range(0, 3):
                 for x in range(0, 3):
                     storage[y] = storage[y] + self[y] * other[x][y]
@@ -71,7 +71,7 @@ class vec4():
             return storage
 
         if isinstance(other, Mat4x4):
-            storage = vec4()
+            storage = Vec4()
             for y in range(0, 4):
                 for x in range(0, 4):
                     storage[y] = storage[y] + self[y] * other[x][y]
@@ -82,9 +82,9 @@ class vec4():
 
 # each vector is a row
 class Mat3x3():
-    def __init__(self, array=[vec3(1, 0, 0),
-                              vec3(0, 1, 0),
-                              vec3(0, 0, 1)]) -> None:
+    def __init__(self, array=[Vec3(1, 0, 0),
+                              Vec3(0, 1, 0),
+                              Vec3(0, 0, 1)]) -> None:
         self.matrix = array
 
     def __getitem__(self, key):
@@ -95,7 +95,7 @@ class Mat3x3():
         if not isinstance(other, Mat3x3):
             return None
 
-        output = Mat3x3(array=[vec3(), vec3(), vec3()])
+        output = Mat3x3(array=[Vec3(), Vec3(), Vec3()])
         for a in range(0, 3):
             for b in range(0, 3):
                 for c in range(0, 3):
@@ -115,10 +115,10 @@ class Mat3x3():
 
 
 class Mat4x4():
-    def __init__(self, array=[vec4(1, 0, 0, 0),
-                              vec4(0, 1, 0, 0),
-                              vec4(0, 0, 1, 0),
-                              vec4(0, 0, 0, 1)]) -> None:
+    def __init__(self, array=[Vec4(1, 0, 0, 0),
+                              Vec4(0, 1, 0, 0),
+                              Vec4(0, 0, 1, 0),
+                              Vec4(0, 0, 0, 1)]) -> None:
         self.matrix = array
 
     def __getitem__(self, key):
@@ -135,10 +135,10 @@ class Mat4x4():
     def __mul__(self, other: Mat4x4) -> Mat4x4:
         if not isinstance(other, Mat4x4):
             return False
-        output = Mat4x4(array=[vec4(),
-                               vec4(),
-                               vec4(),
-                               vec4()])
+        output = Mat4x4(array=[Vec4(),
+                               Vec4(),
+                               Vec4(),
+                               Vec4()])
         for a in range(0, 4):
             for b in range(0, 4):
                 for c in range(0, 4):
@@ -148,6 +148,9 @@ class Mat4x4():
     __slots__ = ["matrix"]
 
 
-class Calculator():
-    def __init__(self):
-        self
+def RotateX(Mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
+    rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 1)
+    Mat*=rotationMatrix
