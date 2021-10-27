@@ -1,3 +1,4 @@
+from __future__ import annotations
 import Math3D
 
 
@@ -8,14 +9,16 @@ class Mesh():
 
 
 class Transform():
-    def __init__(self):
-        self.Matrix = Math3D.Mat4x4
-        self.Position = Math3D.Vec4
-        self.Rotation = Math3D.Vec4
+    def __init__(self, parent=None):
+        self.parent = parent
+        self.Matrix = Math3D.Mat4x4()
+        self.Position = Math3D.Vec4()
+        self.Rotation = Math3D.Vec4()
 
 
 class Camera:
-    def __init__(self, position, target, nearPlane=1, farPlane=10) -> None:
+    def __init__(self, position=Math3D.Vec4(), target=Math3D.Vec4(z=1),
+                 nearPlane=1, farPlane=10) -> None:
         self.transform = None
         self.near = nearPlane
         self.far = farPlane
@@ -43,12 +46,21 @@ class Camera:
     __slots__ = ['width', 'height', 'distance']
 
 
-class Object:
+class gameObject:
     def __init__(self) -> None:
         self.mesh = None
         self.transform = None
 
     __slots__ = ["Mesh", "Position"]
+
+
+class Scene:
+    def __init__(self) -> None:
+        self.Objects = [gameObject()]
+        self.Camera = Camera()
+
+    def addObject(self, obj: gameObject):
+        self.Objects.append(obj)
 
 
 def CreateCube(scale=1) -> Mesh:
