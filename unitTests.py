@@ -34,6 +34,33 @@ class testMat(unittest.TestCase):
 
     def test_XRotation(self):
         mat = voidMath.Mat4x4()
+        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 0, 0),
+                                        voidMath.Vec4(0, 0, -1, 0),
+                                        voidMath.Vec4(0, 1, 0, 0),
+                                        voidMath.Vec4(0, 0, 0, 1)])
+
+        voidMath.RotateX(mat, 90)
+        self.assertEqual(mat, rotmat)
+
+    def test_YRotation(self):
+        mat = voidMath.Mat4x4()
+        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(0, 0, 1, 0),
+                                        voidMath.Vec4(0, 1, 0, 0),
+                                        voidMath.Vec4(-1, 0, 0, 0),
+                                        voidMath.Vec4(0, 0, 0, 1)])
+
+        voidMath.RotateY(mat, 90)
+        self.assertEqual(mat, rotmat)
+
+    def test_ZRotation(self):
+        mat = voidMath.Mat4x4()
+        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(0, -1, 0, 0),
+                                        voidMath.Vec4(1, 0, 0, 0),
+                                        voidMath.Vec4(0, 0, 1, 0),
+                                        voidMath.Vec4(0, 0, 0, 1)])
+
+        voidMath.RotateZ(mat, 90)
+        self.assertEqual(mat, rotmat)
 
 
 if __name__ == "__main__":

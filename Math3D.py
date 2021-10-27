@@ -1,5 +1,6 @@
 from __future__ import annotations
-from math import cos, sin, tan, radians
+from math import cos, sin, radians, sqrt
+
 
 class Vec3():
     def __init__(self, x: float = 0, y: float = 0, z: float = 0) -> None:
@@ -57,7 +58,9 @@ class Vec4():
         if not isinstance(other, Vec4):
             return False
         for i in range(4):
-            if other.array[i] != self.array[i]:
+            a = round(self.array[i], 4)
+            b = round(other.array[i], 4)
+            if a != b:
                 return False
         return True
 
@@ -124,6 +127,9 @@ class Mat4x4():
     def __getitem__(self, key):
         return self.matrix[key]
 
+    def __setitem__(self, key, other):
+        self.matrix[key] = other
+
     def __eq__(self, other: Mat4x4) -> bool:
         if not isinstance(other, Mat4x4):
             return False
@@ -152,5 +158,37 @@ def RotateX(Mat: Mat4x4, angle: float) -> None:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
     rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
-    rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 1)
-    Mat*=rotationMatrix
+    rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
+    Mat *= rotationMatrix
+
+
+def RotateY(Mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
+    rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
+    Mat *= rotationMatrix
+
+
+def RotateZ(Mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
+    rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
+    Mat *= rotationMatrix
+
+
+def normalize(vec: Vec4):
+    mag = sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z))
+    vec[0] /= mag
+    vec[1] /= mag
+    vec[2] /= mag
+
+
+def cross(vec1: Vec4, vec2: Vec4):
+    output = Vec4()
+    output[0] = vec1.y * vec2.z - vec2.y * vec1.z
+    output[1] = vec1.x * vec2.z - vec2.x * vec1.z
+    output[2] = vec1.x * vec2.y - vec2.x * vec1.y
+
+    return output
