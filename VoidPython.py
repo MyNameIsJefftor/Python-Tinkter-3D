@@ -5,6 +5,7 @@ import Math3D
 class Mesh():
     def __init__(self):
         self.points = [Math3D.Vec4()]
+        self.ProjectedPoints = self.points
         self.sets = [Math3D.Vec3()]
 
 
@@ -37,30 +38,28 @@ class Camera:
                               self.forward[2])
 
         mat2 = Math3D.Mat4x4()
-        mat2[0][3] = -self.position.x
-        mat2[1][3] = -self.position.y
-        mat2[2][3] = -self.position.z
+        mat2[0][3] = -self.position.x()
+        mat2[1][3] = -self.position.y()
+        mat2[2][3] = -self.position.z()
 
         return mat1*mat2
-
-    __slots__ = ['width', 'height', 'distance']
 
 
 class gameObject:
     def __init__(self) -> None:
-        self.mesh = None
-        self.transform = None
-
-    __slots__ = ["Mesh", "Position"]
+        self.myMesh = Mesh()
+        self.transform = Math3D.Mat4x4()
 
 
 class Scene:
     def __init__(self) -> None:
-        self.Objects = [gameObject()]
+        self.gameObjects = [gameObject()]
         self.Camera = Camera()
 
     def addObject(self, obj: gameObject):
-        self.Objects.append(obj)
+        if not isinstance(obj, gameObject):
+            return
+        self.gameObjects.append(obj)
 
 
 def CreateCube(scale=1) -> Mesh:
@@ -93,3 +92,14 @@ def CreateCube(scale=1) -> Mesh:
                    Math3D.Vec3(7, 5, 4)]
 
     return output
+
+
+def Draw(scene: Scene):
+    if(len(scene.gameObjects) <= 0):
+        return
+
+    projMat = Math3D.createProjectionMatrix()
+    for gObj in scene.gameObjects:
+        gObj.myMesh.ProjectedPoints.clear()
+        for point in gObj.myMesh.points:
+            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.view*projMat)

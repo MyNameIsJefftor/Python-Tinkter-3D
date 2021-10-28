@@ -1,5 +1,5 @@
 from __future__ import annotations
-from math import cos, sin, radians, sqrt
+from math import cos, sin, radians, sqrt, tan
 
 
 class Vec3():
@@ -64,6 +64,22 @@ class Vec4():
                 return False
         return True
 
+    def __add__(self, other) -> Vec4:
+        output = Vec4()
+        output[0] = self.x() + other.x()
+        output[1] = self.y() + other.y()
+        output[2] = self.z() + other.z()
+        output[3] = self.w() + other.w()
+        return output
+
+    def __sub__(self, other) -> Vec4:
+        output = Vec4()
+        output[0] = self.x() - other.x()
+        output[1] = self.y() - other.y()
+        output[2] = self.z() - other.z()
+        output[3] = self.w() - other.w()
+        return output
+
     def __mul__(self, other: Mat3x3) -> Vec4:
         if isinstance(other, Mat3x3):
             storage = Vec4()
@@ -92,6 +108,19 @@ class Mat3x3():
 
     def __getitem__(self, key):
         return self.matrix[key]
+
+    def __rmul__(self, other: Mat3x3) -> Mat3x3:
+
+        if not isinstance(other, Mat3x3):
+            return None
+
+        output = Mat3x3(array=[Vec3(), Vec3(), Vec3()])
+        for a in range(0, 3):
+            for b in range(0, 3):
+                for c in range(0, 3):
+                    output[a][b] = output[a][b] + self[a][c] * other[c][b]
+
+        return output
 
     def __mul__(self, other: Mat3x3) -> Mat3x3:
 
@@ -139,17 +168,24 @@ class Mat4x4():
         return True
 
     def __mul__(self, other: Mat4x4) -> Mat4x4:
-        if not isinstance(other, Mat4x4):
-            return False
-        output = Mat4x4(array=[Vec4(),
-                               Vec4(),
-                               Vec4(),
-                               Vec4()])
-        for a in range(0, 4):
-            for b in range(0, 4):
-                for c in range(0, 4):
-                    output[a][b] = output[a][b] + self[a][c] * other[c][b]
-        return output
+        if isinstance(other, Mat4x4):
+            output = Mat4x4(array=[Vec4(),
+                                   Vec4(),
+                                   Vec4(),
+                                   Vec4()])
+            for a in range(0, 4):
+                for b in range(0, 4):
+                    for c in range(0, 4):
+                        output[a][b] = output[a][b] + self[a][c] * other[c][b]
+            return output
+        elif isinstance(other, Vec4):
+            storage = Vec4()
+            for y in range(0, 4):
+                for x in range(0, 4):
+                    storage[y] = storage[y] + other[y] * self[x][y]
+            return storage
+
+        return None
 
     __slots__ = ["matrix"]
 
@@ -178,17 +214,32 @@ def RotateZ(Mat: Mat4x4, angle: float) -> None:
     Mat *= rotationMatrix
 
 
-def normalize(vec: Vec4):
-    mag = sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z))
-    vec[0] /= mag
-    vec[1] /= mag
-    vec[2] /= mag
+def normalize(vec: Vec4) -> Vec4:
+    mag = sqrt((vec.x() * vec.x()) + (vec.y() * vec.y()) + (vec.z() * vec.z()))
+    output = Vec4()
+    output[0] = vec[0] / mag
+    output[1] = vec[1] / mag
+    output[2] = vec[2] / mag
+    return output
 
 
 def cross(vec1: Vec4, vec2: Vec4):
     output = Vec4()
-    output[0] = vec1.y * vec2.z - vec2.y * vec1.z
-    output[1] = vec1.x * vec2.z - vec2.x * vec1.z
-    output[2] = vec1.x * vec2.y - vec2.x * vec1.y
+    output[0] = vec1.y() * vec2.z() - vec2.y() * vec1.z()
+    output[1] = vec1.x() * vec2.z() - vec2.x() * vec1.z()
+    output[2] = vec1.x() * vec2.y() - vec2.x() * vec1.y()
 
+    return output
+
+
+def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
+    Scale = 1/tan(radians(FOV))
+
+    A = -(Far/(Far-Near))
+    B = -((Far*Near)/(Far-Near))
+
+    output = Mat4x4(array=[Vec4(Scale, 0, 0, 0),
+                           Vec4(0, Scale, 0, 0),
+                           Vec4(0, 0, A, -1),
+                           Vec4(0, 0, B, 0)])
     return output
