@@ -1,5 +1,7 @@
 from __future__ import annotations
 from math import cos, sin, radians, sqrt, tan
+from multiprocessing.dummy import Array
+from turtle import position
 
 
 class Vec3():
@@ -28,6 +30,13 @@ class Vec3():
             if self.array[i] != other.array[i]:
                 return False
         return True
+
+    def __sub__ (Self, other) -> Vec3:
+        output = Vec3()
+        for x in range (0,3):
+            output[x] = Self[x] - other[x]
+
+        return output
 
 
 class Vec4():
@@ -236,10 +245,26 @@ def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
     Scale = 1/tan(radians(FOV))
 
     A = -(Far/(Far-Near))
-    B = -((Far*Near)/(Far-Near))
+    B = -(Far*Near)/(Far-Near)
 
     output = Mat4x4(array=[Vec4(Scale, 0, 0, 0),
                            Vec4(0, Scale, 0, 0),
-                           Vec4(0, 0, A, -1),
+                           Vec4(0, 0, A, 1),
                            Vec4(0, 0, B, 0)])
     return output
+
+def lookAt(Eye: Vec3 = Vec3(0,0,0), Target: Vec3 = Vec3(0,0,-1), up: Vec3 = Vec3(0,1,0)):
+    zAxis = normalize(Eye - Target)
+    xAxis = normalize(cross(up,zAxis))
+    yAxis = cross(zAxis,xAxis)
+
+    orientation = Mat4x4(array=[Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
+                                Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
+                                Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+                                Vec4(0,0,0,1)])
+
+    position = Mat4x4()
+    position.matrix[3] = (Vec4(-Eye.x(), -Eye.y(), -Eye.z(), 1))
+
+    return (orientation*position)
+

@@ -7,8 +7,6 @@ class application(tk.Frame):
         super().__init__(master)
         self.canvas = tk.Canvas(width=200, height=200)
 
-        self.canvas.create_line(10, 10, 80, 80)
-
         self.canvas.pack()
 
 
@@ -23,16 +21,23 @@ def Main():
     primeScene.addObject(cubeObj)
     VP.Draw(primeScene)
 
+    if True:
+        for obj in primeScene.gameObjects:
+           currPoints = primeScene.gameObjects[0].myMesh.ProjectedPoints
+           for set in obj.myMesh.sets:
+               primApp.canvas.create_line(currPoints[set[0]].x(), currPoints[set[0]].y(),
+                                          currPoints[set[1]].x(), currPoints[set[1]].y(),
+                                          currPoints[set[2]].x(), currPoints[set[2]].y(),
+                                          currPoints[set[0]].x(), currPoints[set[0]].y(),)
+
     if False:
         for x in range(0, 1):
             currSet = primeScene.gameObjects[0].myMesh.sets[0]
             currPoints = primeScene.gameObjects[0].myMesh.ProjectedPoints
-            primApp.canvas.create_line(currPoints[currSet.x()].x()+100,
-                                       currPoints[currSet.x()].y()+100,
-                                       currPoints[currSet.y()].x()+100,
-                                       currPoints[currSet.y()].y()+100,
-                                       currPoints[currSet.z()].x()+100,
-                                       currPoints[currSet.z()].y()+100)
+            primApp.canvas.create_line(currPoints[currSet[0]].x()+50, currPoints[currSet[0]].y()+50,
+                                       currPoints[currSet[1]].x()+50, currPoints[currSet[1]].y()+50,
+                                       currPoints[currSet[2]].x()+50, currPoints[currSet[2]].y()+50,
+                                       currPoints[currSet[0]].x()+50, currPoints[currSet[0]].y()+50,)
     while True:
         primApp.update_idletasks()
         primApp.update()

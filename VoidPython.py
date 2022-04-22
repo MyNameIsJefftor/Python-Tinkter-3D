@@ -98,7 +98,7 @@ def Draw(scene: Scene):
     if(len(scene.gameObjects) <= 0):
         return
 
-    projMat = Math3D.createProjectionMatrix()
+    projMat = Math3D.lookAt()
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
         for point in gObj.myMesh.points:
