@@ -1,4 +1,5 @@
 import tkinter as tk
+from Math3D import RotateX, RotateY, Vec4
 import VoidPython as VP
 
 
@@ -14,11 +15,13 @@ def Main():
     root = tk.Tk()
     primApp = application(root)
     primeScene = VP.Scene()
-    primeScene.Camera = VP.Camera()
+    primeScene.Camera = VP.Camera(position=Vec4(100,100,-10))
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
     cubeObj.myMesh = VP.CreateCube(10)
+    RotateX(cubeObj.transform, 45.0)
     primeScene.addObject(cubeObj)
+
     VP.Draw(primeScene)
 
     if True:

@@ -18,37 +18,45 @@ class Transform():
 
 
 class Camera:
-    def __init__(self, position=Math3D.Vec4(), target=Math3D.Vec4(z=1),
+    def __init__(self, position=Math3D.Vec4(),
                  nearPlane=1, farPlane=10) -> None:
         self.transform = None
         self.near = nearPlane
         self.far = farPlane
         self.target = Math3D.Vec4
         self.position = position
-        self.forward = Math3D.normalize(position - target)
-        self.up = Math3D.Vec4(0, 1, 0, 0)
-        self.right = Math3D.normalize(Math3D.cross(self.up, self.forward))
-        self.view = self.createLookat()
+        self.up = Math3D.Vec4(0, 1)
+        self.right = Math3D.Vec4(1)
+        self.view = self.createLookat(Math3D.Vec4(0,0,1,0))
 
-    def createLookat(self) -> Math3D.Mat4x4:
-        mat1 = Math3D.Mat4x4()
-        mat1[0] = Math3D.Vec4(self.right[0], self.right[1], self.right[2], 0)
-        mat1[1] = Math3D.Vec4(self.up[0], self.up[1], self.up[2], 0)
-        mat1[2] = Math3D.Vec4(self.forward[0], self.forward[1],
-                              self.forward[2])
+    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,1,0)) -> Math3D.Mat4x4:
 
-        mat2 = Math3D.Mat4x4()
-        mat2[0][3] = -self.position.x()
-        mat2[1][3] = -self.position.y()
-        mat2[2][3] = -self.position.z()
+        zAxis = Math3D.normalize(self.position - target)
+        xAxis = Math3D.normalize(Math3D.cross(self.up,zAxis))
+        yAxis = Math3D.cross(zAxis,xAxis)
 
-        return mat1*mat2
+        orientation = Math3D.Mat4x4(array=[
+                                           Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
+                                           Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
+                                           Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+                                           Math3D.Vec4(w=1)
+                                          ])
+
+        positionMat = Math3D.Mat4x4()
+        positionMat.matrix[3] = (Math3D.Vec4(-self.position.x(), -self.position.y(), -self.position.z(), 1))
+
+        return (orientation*positionMat)
 
 
 class gameObject:
     def __init__(self) -> None:
         self.myMesh = Mesh()
         self.transform = Math3D.Mat4x4()
+
+    def updateMesh(self) -> None:
+        for point in self.myMesh.points:
+            point = self.transform * point
+        return
 
 
 class Scene:
@@ -102,4 +110,4 @@ def Draw(scene: Scene):
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
         for point in gObj.myMesh.points:
-            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.view*projMat)
+            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.view*scene.Camera.createLookat())

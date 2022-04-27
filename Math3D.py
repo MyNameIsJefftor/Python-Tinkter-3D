@@ -73,7 +73,10 @@ class Vec4():
                 return False
         return True
 
-    def __add__(self, other) -> Vec4:
+    def __add__(self, other : Vec4) -> Vec4:
+        if not isinstance(other, Vec4):
+            return
+
         output = Vec4()
         output[0] = self.x() + other.x()
         output[1] = self.y() + other.y()
@@ -104,6 +107,13 @@ class Vec4():
                 for x in range(0, 4):
                     storage[y] = storage[y] + self[y] * other[x][y]
             return storage
+
+        if isinstance(other, Vec4):
+            storage = Vec4()
+            for i in range (0,4):
+                storage[i] = self[i] * other[i]
+            return storage
+
 
         return None
 
@@ -202,6 +212,7 @@ class Mat4x4():
 def RotateX(Mat: Mat4x4, angle: float) -> None:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
+    rotationMatrix[0] = Vec4(1)
     rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
     rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
     Mat *= rotationMatrix
