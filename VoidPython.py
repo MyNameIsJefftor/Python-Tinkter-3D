@@ -1,4 +1,6 @@
 from __future__ import annotations
+from cmath import tan
+from math import radians
 import Math3D
 
 
@@ -27,7 +29,6 @@ class Camera:
         self.position = position
         self.up = Math3D.Vec4(0, 1)
         self.right = Math3D.Vec4(1)
-        self.view = self.createLookat(Math3D.Vec4(0,0,1,0))
 
     def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,1,0)) -> Math3D.Mat4x4:
 
@@ -46,6 +47,17 @@ class Camera:
         positionMat.matrix[3] = (Math3D.Vec4(-self.position.x(), -self.position.y(), -self.position.z(), 1))
 
         return (orientation*positionMat)
+
+    def createProjMat(self, fov : int = 90) -> Math3D.Mat4x4:
+        scale = 1/tan(radians(fov/2))
+        extraVal1 = (self.far/(self.far - self.near))
+        extraVal2 = ((self.far*self.near)/(self.far-self.near))
+        output = Math3D.Mat4x4(array=[Math3D.Vec4(scale, 0, 0, 0),
+                                      Math3D.Vec4(0, scale, 0, 0),
+                                      Math3D.Vec4(0, 0, extraVal1, -1),
+                                      Math3D.Vec4(0, 0, extraVal2, 0)])
+
+        return output
 
 
 class gameObject:
@@ -110,4 +122,4 @@ def Draw(scene: Scene):
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
         for point in gObj.myMesh.points:
-            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.view*scene.Camera.createLookat())
+            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.createLookat()*scene.Camera.createProjMat())

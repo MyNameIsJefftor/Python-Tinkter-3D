@@ -15,10 +15,10 @@ def Main():
     root = tk.Tk()
     primApp = application(root)
     primeScene = VP.Scene()
-    primeScene.Camera = VP.Camera(position=Vec4(100,100,-10))
+    primeScene.Camera = VP.Camera(position=Vec4(100,100,100))
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
-    cubeObj.myMesh = VP.CreateCube(10)
+    cubeObj.myMesh = VP.CreateCube(0.5)
     RotateX(cubeObj.transform, 45.0)
     primeScene.addObject(cubeObj)
 
