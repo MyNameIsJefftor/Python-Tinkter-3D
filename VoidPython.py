@@ -49,7 +49,9 @@ class Camera:
         return (orientation*positionMat)
 
     def createProjMat(self, fov : int = 90) -> Math3D.Mat4x4:
-        scale = 1/tan(radians(fov/2))
+        scale = fov/2
+        scale = radians(scale)
+        scale = 1/tan(scale).real
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
         output = Math3D.Mat4x4(array=[Math3D.Vec4(scale, 0, 0, 0),
@@ -121,5 +123,8 @@ def Draw(scene: Scene):
     projMat = Math3D.lookAt()
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
+        FinalMat = gObj.transform
+        FinalMat = FinalMat*scene.Camera.createLookat()
+        FinalMat = FinalMat*scene.Camera.createProjMat()
         for point in gObj.myMesh.points:
-            gObj.myMesh.ProjectedPoints.append(point*gObj.transform*scene.Camera.createLookat()*scene.Camera.createProjMat())
+            gObj.myMesh.ProjectedPoints.append(point*FinalMat)
