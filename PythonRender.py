@@ -15,7 +15,10 @@ class application(tk.Frame):
     def onWindowClose(self):
         self.windowOpen = False
 
+
 def Main():
+
+    # Setup app
     root = tk.Tk()
     primApp = application(root)
     root.protocol("WM_DELETE_WINDOW", primApp.onWindowClose)
@@ -24,19 +27,16 @@ def Main():
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
     cubeObj.myMesh = VP.CreateCube(1)
-    RotateX(cubeObj.transform, 45.0)
+    #RotateX(cubeObj.transform, 45.0)
     primeScene.addObject(cubeObj)
 
-    VP.Draw(primeScene)
-
-    if True:
-        for obj in primeScene.gameObjects:
-           currPoints = primeScene.gameObjects[0].myMesh.ProjectedPoints
-           for set in obj.myMesh.sets:
-               primApp.canvas.create_line(currPoints[set[0]].x()*200, currPoints[set[0]].y()*200,
-                                          currPoints[set[1]].x()*200, currPoints[set[1]].y()*200,
-                                          currPoints[set[2]].x()*200, currPoints[set[2]].y()*200,
-                                          currPoints[set[0]].x()*200, currPoints[set[0]].y()*200,)
+    # Setup inputs
+    VP.onKeyPress("w", primeScene.MoveCameraPosX)
+    VP.onKeyPress("s", primeScene.MoveCameraNegX)
+    VP.onKeyPress("a", primeScene.MoveCameraPosY)
+    VP.onKeyPress("d", primeScene.MoveCameraNegY)
+    VP.onKeyPress("q", primeScene.MoveCameraPosZ)
+    VP.onKeyPress("e", primeScene.MoveCameraNegZ)
 
     if False:
         for x in range(0, 1):
@@ -47,11 +47,20 @@ def Main():
                                        currPoints[currSet[2]].x()+50, currPoints[currSet[2]].y()+50,
                                        currPoints[currSet[0]].x()+50, currPoints[currSet[0]].y()+50,)
     while primApp.windowOpen:
+        if VP.Draw(primeScene):
+            primApp.canvas.delete('all')
+
+            for obj in primeScene.gameObjects:
+               currPoints = primeScene.gameObjects[0].myMesh.ProjectedPoints
+               for set in obj.myMesh.sets:
+                   primApp.canvas.create_line(currPoints[set[0]].x(), currPoints[set[0]].y(),
+                                              currPoints[set[1]].x(), currPoints[set[1]].y(),
+                                              currPoints[set[2]].x(), currPoints[set[2]].y(),
+                                              currPoints[set[0]].x(), currPoints[set[0]].y(),)
         primApp.update_idletasks()
         primApp.update()
 
     primApp.master.destroy()
-
 
 if __name__ == '__main__':
     Main()

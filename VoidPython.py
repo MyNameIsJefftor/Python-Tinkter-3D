@@ -1,8 +1,8 @@
 from __future__ import annotations
 from cmath import tan
 from math import radians
+from keyboard import on_press_key as onKeyPress
 import Math3D
-
 
 class Mesh():
     def __init__(self):
@@ -30,8 +30,26 @@ class Camera:
         self.up = Math3D.Vec4(0, 1)
         self.right = Math3D.Vec4(1)
 
-    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,1,0)) -> Math3D.Mat4x4:
+    def MovePosX(self):
+        self.position = self.position + Math3D.Vec4(x=1)
 
+    def MoveNegX(self):
+        self.position = self.position + Math3D.Vec4(x=-1)
+
+    def MovePosY(self):
+        self.position = self.position + Math3D.Vec4(y=1)
+
+    def MoveNegY(self):
+        self.position = self.position + Math3D.Vec4(y=-1)
+
+    def MovePosZ(self):
+        self.position = self.position + Math3D.Vec4(z=1)
+
+    def MoveNegZ(self):
+        self.position = self.position + Math3D.Vec4(z=-1)
+
+    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,1,0)) -> Math3D.Mat4x4:
+        target = self.position + Math3D.Vec4(x=1)
         zAxis = Math3D.normalize(self.position - target)
         xAxis = Math3D.normalize(Math3D.cross(self.up,zAxis))
         yAxis = Math3D.cross(zAxis,xAxis)
@@ -77,11 +95,36 @@ class Scene:
     def __init__(self) -> None:
         self.gameObjects = [gameObject()]
         self.Camera = Camera()
+        self.Refresh = True
 
     def addObject(self, obj: gameObject):
         if not isinstance(obj, gameObject):
             return
         self.gameObjects.append(obj)
+
+    def MoveCameraPosX(self, other):
+        self.Camera.MovePosX()
+        self.Refresh = True
+
+    def MoveCameraNegX(self, other):
+        self.Camera.MoveNegX()
+        self.Refresh = True
+
+    def MoveCameraPosY(self, other):
+        self.Camera.MovePosY()
+        self.Refresh = True
+
+    def MoveCameraNegY(self, other):
+        self.Camera.MoveNegY()
+        self.Refresh = True
+
+    def MoveCameraPosZ(self, other):
+        self.Camera.MovePosZ()
+        self.Refresh = True
+
+    def MoveCameraNegZ(self, other):
+        self.Camera.MoveNegZ()
+        self.Refresh = True
 
 
 def CreateCube(scale=1) -> Mesh:
@@ -116,9 +159,10 @@ def CreateCube(scale=1) -> Mesh:
     return output
 
 
-def Draw(scene: Scene):
-    if(len(scene.gameObjects) <= 0):
-        return
+def Draw(scene: Scene) -> bool:
+
+    if(len(scene.gameObjects) <= 0 or not scene.Refresh):
+        return False
 
     projMat = Math3D.lookAt()
     for gObj in scene.gameObjects:
@@ -128,3 +172,6 @@ def Draw(scene: Scene):
         FinalMat = FinalMat*scene.Camera.createProjMat()
         for point in gObj.myMesh.points:
             gObj.myMesh.ProjectedPoints.append(point*FinalMat)
+
+    scene.Refresh = False
+    return True
