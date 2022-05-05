@@ -48,16 +48,20 @@ class Camera:
     def MoveNegZ(self):
         self.position = self.position + Math3D.Vec4(z=-1)
 
-    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,1,0)) -> Math3D.Mat4x4:
-        target = self.position + Math3D.Vec4(x=1)
+    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,0,0)) -> Math3D.Mat4x4:
+        #Look
         zAxis = Math3D.normalize(self.position - target)
+
+        #Right
         xAxis = Math3D.normalize(Math3D.cross(self.up,zAxis))
+
+        #Up
         yAxis = Math3D.cross(zAxis,xAxis)
 
         orientation = Math3D.Mat4x4(array=[
-                                           Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
-                                           Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
-                                           Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+                                           Math3D.Vec4(xAxis.x(), xAxis.y(), xAxis.z(), -self.position.x()),
+                                           Math3D.Vec4(yAxis.x(), yAxis.y(), yAxis.z(), -self.position.y()),
+                                           Math3D.Vec4(zAxis.x(), zAxis.y(), zAxis.z(), -self.position.z()),
                                            Math3D.Vec4(w=1)
                                           ])
 

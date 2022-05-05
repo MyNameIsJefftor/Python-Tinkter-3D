@@ -23,11 +23,11 @@ def Main():
     primApp = application(root)
     root.protocol("WM_DELETE_WINDOW", primApp.onWindowClose)
     primeScene = VP.Scene()
-    primeScene.Camera = VP.Camera(position=Vec4(0,0,-5))
+    primeScene.Camera = VP.Camera(position=Vec4(0,0,5))
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
     cubeObj.myMesh = VP.CreateCube(1)
-    #RotateX(cubeObj.transform, 45.0)
+    RotateX(cubeObj.transform, 45.0)
     primeScene.addObject(cubeObj)
 
     # Setup inputs
@@ -51,7 +51,7 @@ def Main():
             primApp.canvas.delete('all')
 
             for obj in primeScene.gameObjects:
-               currPoints = primeScene.gameObjects[0].myMesh.ProjectedPoints
+               currPoints = obj.myMesh.ProjectedPoints
                for set in obj.myMesh.sets:
                    primApp.canvas.create_line(currPoints[set[0]].x(), currPoints[set[0]].y(),
                                               currPoints[set[1]].x(), currPoints[set[1]].y(),

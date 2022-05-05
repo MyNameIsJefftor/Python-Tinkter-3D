@@ -208,11 +208,10 @@ class Mat4x4():
 
     __slots__ = ["matrix"]
 
-
+#Right Handed Rotations
 def RotateX(Mat: Mat4x4, angle: float) -> None:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
-    rotationMatrix[0] = Vec4(1)
     rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
     rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
     Mat *= rotationMatrix
@@ -251,7 +250,7 @@ def cross(vec1: Vec4, vec2: Vec4):
 
     return output
 
-
+#right handed Proj
 def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
     Scale = 1/tan(radians(FOV))
 
@@ -260,18 +259,19 @@ def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
 
     output = Mat4x4(array=[Vec4(Scale, 0, 0, 0),
                            Vec4(0, Scale, 0, 0),
-                           Vec4(0, 0, A, 1),
+                           Vec4(0, 0, A, -1),
                            Vec4(0, 0, B, 0)])
     return output
 
+#right Handed
 def lookAt(Eye: Vec3 = Vec3(0,0,0), Target: Vec3 = Vec3(0,0,-1), up: Vec3 = Vec3(0,1,0)):
     zAxis = normalize(Eye - Target)
     xAxis = normalize(cross(up,zAxis))
     yAxis = cross(zAxis,xAxis)
 
-    orientation = Mat4x4(array=[Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
-                                Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
-                                Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+    orientation = Mat4x4(array=[Vec4(xAxis.x(), yAxis.x(), -zAxis.x(), 0),
+                                Vec4(xAxis.y(), yAxis.y(), -zAxis.y(), 0),
+                                Vec4(xAxis.z(), yAxis.z(), -zAxis.z(), 0),
                                 Vec4(0,0,0,1)])
 
     position = Mat4x4()
