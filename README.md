@@ -1,2 +1,2 @@
 # VoidGraphicsPythonEdition
- Renders 3D graphics to a python canvas. A side project I'm working on in my free time.
+ The end goal is to render a cube using python Tinkter and no other libraries.
