@@ -31,12 +31,12 @@ def Main():
     primeScene.addObject(cubeObj)
 
     # Setup inputs
-    VP.onKeyPress("w", primeScene.MoveCameraPosX)
-    VP.onKeyPress("s", primeScene.MoveCameraNegX)
+    VP.onKeyPress("w", primeScene.MoveCameraPosZ)
+    VP.onKeyPress("s", primeScene.MoveCameraNegZ)
     VP.onKeyPress("a", primeScene.MoveCameraPosY)
     VP.onKeyPress("d", primeScene.MoveCameraNegY)
-    VP.onKeyPress("q", primeScene.MoveCameraPosZ)
-    VP.onKeyPress("e", primeScene.MoveCameraNegZ)
+    VP.onKeyPress("q", primeScene.MoveCameraPosX)
+    VP.onKeyPress("e", primeScene.MoveCameraNegX)
 
     if False:
         for x in range(0, 1):
@@ -53,10 +53,10 @@ def Main():
             for obj in primeScene.gameObjects:
                currPoints = obj.myMesh.ProjectedPoints
                for set in obj.myMesh.sets:
-                   primApp.canvas.create_line(currPoints[set[0]].x(), currPoints[set[0]].y(),
-                                              currPoints[set[1]].x(), currPoints[set[1]].y(),
-                                              currPoints[set[2]].x(), currPoints[set[2]].y(),
-                                              currPoints[set[0]].x(), currPoints[set[0]].y(),)
+                   primApp.canvas.create_line(currPoints[set[0]].x()*100+100, currPoints[set[0]].y()*100+100,
+                                              currPoints[set[1]].x()*100+100, currPoints[set[1]].y()*100+100,
+                                              currPoints[set[2]].x()*100+100, currPoints[set[2]].y()*100+100,
+                                              currPoints[set[0]].x()*100+100, currPoints[set[0]].y()*100+100,)
         primApp.update_idletasks()
         primApp.update()
 

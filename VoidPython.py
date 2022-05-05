@@ -31,22 +31,22 @@ class Camera:
         self.right = Math3D.Vec4(1)
 
     def MovePosX(self):
-        self.position = self.position + Math3D.Vec4(x=1)
+        self.position = self.position + Math3D.Vec4(x=0.1)
 
     def MoveNegX(self):
-        self.position = self.position + Math3D.Vec4(x=-1)
+        self.position = self.position + Math3D.Vec4(x=-0.1)
 
     def MovePosY(self):
-        self.position = self.position + Math3D.Vec4(y=1)
+        self.position = self.position + Math3D.Vec4(y=0.1)
 
     def MoveNegY(self):
-        self.position = self.position + Math3D.Vec4(y=-1)
+        self.position = self.position + Math3D.Vec4(y=-0.1)
 
     def MovePosZ(self):
-        self.position = self.position + Math3D.Vec4(z=1)
+        self.position = self.position + Math3D.Vec4(z=0.1)
 
     def MoveNegZ(self):
-        self.position = self.position + Math3D.Vec4(z=-1)
+        self.position = self.position + Math3D.Vec4(z=-0.1)
 
     def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,0,0)) -> Math3D.Mat4x4:
         #Look
@@ -138,14 +138,14 @@ def CreateCube(scale=1) -> Mesh:
         scale = abs(scale)
 
     output = Mesh()
-    output.points = [Math3D.Vec4(1*scale,   1*scale,    1*scale,   0),
-                     Math3D.Vec4(1*scale,   1*scale,   -1*scale,   0),
-                     Math3D.Vec4(-1*scale,  1*scale,   -1*scale,   0),
-                     Math3D.Vec4(-1*scale,  1*scale,    1*scale,   0),
-                     Math3D.Vec4(1*scale,  -1*scale,    1*scale,   0),
-                     Math3D.Vec4(1*scale,  -1*scale,   -1*scale,   0),
-                     Math3D.Vec4(-1*scale, -1*scale,   -1*scale,   0),
-                     Math3D.Vec4(-1*scale, -1*scale,    1*scale,   0)]
+    output.points = [Math3D.Vec4(1*scale,   1*scale,    1*scale,   1),
+                     Math3D.Vec4(1*scale,   1*scale,   -1*scale,   1),
+                     Math3D.Vec4(-1*scale,  1*scale,   -1*scale,   1),
+                     Math3D.Vec4(-1*scale,  1*scale,    1*scale,   1),
+                     Math3D.Vec4(1*scale,  -1*scale,    1*scale,   1),
+                     Math3D.Vec4(1*scale,  -1*scale,   -1*scale,   1),
+                     Math3D.Vec4(-1*scale, -1*scale,   -1*scale,   1),
+                     Math3D.Vec4(-1*scale, -1*scale,    1*scale,   1)]
 
     output.sets = [Math3D.Vec3(6, 2, 1),
                    Math3D.Vec3(6, 1, 5),
@@ -171,11 +171,18 @@ def Draw(scene: Scene) -> bool:
     projMat = Math3D.lookAt()
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
+        scene.Refresh = False
         FinalMat = gObj.transform
         FinalMat = FinalMat*scene.Camera.createLookat()
         FinalMat = FinalMat*scene.Camera.createProjMat()
         for point in gObj.myMesh.points:
-            gObj.myMesh.ProjectedPoints.append(point*FinalMat)
+            newPoint = point*FinalMat
+            if newPoint[3] is not 1:
+                newPoint[0] = newPoint[0]/newPoint[3]
+                newPoint[1] = newPoint[1]/newPoint[3]
+                newPoint[2] = newPoint[2]/newPoint[3]
+                newPoint[3] = 1
 
-    scene.Refresh = False
+            gObj.myMesh.ProjectedPoints.append(newPoint)
+
     return True
