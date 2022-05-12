@@ -1,7 +1,5 @@
 from __future__ import annotations
 from math import cos, sin, radians, sqrt, tan
-from multiprocessing.dummy import Array
-from turtle import position
 
 
 class Vec3():
@@ -31,9 +29,9 @@ class Vec3():
                 return False
         return True
 
-    def __sub__ (Self, other) -> Vec3:
+    def __sub__(Self, other) -> Vec3:
         output = Vec3()
-        for x in range (0,3):
+        for x in range(0, 3):
             output[x] = Self[x] - other[x]
 
         return output
@@ -73,7 +71,7 @@ class Vec4():
                 return False
         return True
 
-    def __add__(self, other : Vec4) -> Vec4:
+    def __add__(self, other: Vec4) -> Vec4:
         if not isinstance(other, Vec4):
             return
 
@@ -110,10 +108,9 @@ class Vec4():
 
         if isinstance(other, Vec4):
             storage = Vec4()
-            for i in range (0,4):
+            for i in range(0, 4):
                 storage[i] = self[i] * other[i]
             return storage
-
 
         return None
 
@@ -208,7 +205,8 @@ class Mat4x4():
 
     __slots__ = ["matrix"]
 
-#Right Handed Rotations
+
+# Right Handed Rotations
 def RotateX(Mat: Mat4x4, angle: float) -> None:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
@@ -233,6 +231,7 @@ def RotateZ(Mat: Mat4x4, angle: float) -> None:
     Mat *= rotationMatrix
 
 
+# Vector Math
 def normalize(vec: Vec4) -> Vec4:
     mag = sqrt((vec.x() * vec.x()) + (vec.y() * vec.y()) + (vec.z() * vec.z()))
     output = Vec4()
@@ -242,7 +241,7 @@ def normalize(vec: Vec4) -> Vec4:
     return output
 
 
-def cross(vec1: Vec4, vec2: Vec4):
+def cross(vec1: Vec4, vec2: Vec4) -> Vec4:
     output = Vec4()
     output[0] = vec1.y() * vec2.z() - vec2.y() * vec1.z()
     output[1] = vec1.x() * vec2.z() - vec2.x() * vec1.z()
@@ -250,9 +249,14 @@ def cross(vec1: Vec4, vec2: Vec4):
 
     return output
 
-#right handed Proj
+
+def dot(vec1: Vec4, vec2: Vec4) -> float:
+    return vec1.x()*vec2.x() + vec1.y()*vec2.y() + vec1.z()*vec2.z()
+
+
+# right handed Proj
 def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
-    Scale = 1/tan(radians(FOV))
+    Scale = 1/tan(radians(FOV/2))
 
     A = -(Far/(Far-Near))
     B = -(Far*Near)/(Far-Near)
@@ -263,19 +267,20 @@ def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
                            Vec4(0, 0, B, 0)])
     return output
 
-#right Handed
-def lookAt(Eye: Vec3 = Vec3(0,0,0), Target: Vec3 = Vec3(0,0,-1), up: Vec3 = Vec3(0,1,0)):
+
+# right Handed
+def lookAt(Eye: Vec3 = Vec3(0, 0, 0), Target: Vec3 = Vec3(0, 0, -1),
+           up: Vec3 = Vec3(0, 1, 0)):
     zAxis = normalize(Eye - Target)
-    xAxis = normalize(cross(up,zAxis))
-    yAxis = cross(zAxis,xAxis)
+    xAxis = normalize(cross(up, zAxis))
+    yAxis = cross(zAxis, xAxis)
 
     orientation = Mat4x4(array=[Vec4(xAxis.x(), yAxis.x(), -zAxis.x(), 0),
                                 Vec4(xAxis.y(), yAxis.y(), -zAxis.y(), 0),
                                 Vec4(xAxis.z(), yAxis.z(), -zAxis.z(), 0),
-                                Vec4(0,0,0,1)])
+                                Vec4(0, 0, 0, 1)])
 
     position = Mat4x4()
     position.matrix[3] = (Vec4(-Eye.x(), -Eye.y(), -Eye.z(), 1))
 
     return (orientation*position)
-

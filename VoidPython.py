@@ -1,8 +1,8 @@
 from __future__ import annotations
 from cmath import tan
 from math import radians
-from keyboard import on_press_key as onKeyPress
 import Math3D
+
 
 class Mesh():
     def __init__(self):
@@ -48,31 +48,31 @@ class Camera:
     def MoveNegZ(self):
         self.position = self.position + Math3D.Vec4(z=-0.1)
 
-    def createLookat(self, target: Math3D.Vec4 = Math3D.Vec4(0,0,0,0)) -> Math3D.Mat4x4:
-        #Look
+    def createLookat(self,
+                     target: Math3D.Vec4 = Math3D.Vec4(0, 0, 1, 0)) -> Math3D.Mat4x4:
+        # Look
         zAxis = Math3D.normalize(self.position - target)
 
-        #Right
-        xAxis = Math3D.normalize(Math3D.cross(self.up,zAxis))
+        # Right
+        xAxis = Math3D.normalize(Math3D.cross(self.up, zAxis))
 
-        #Up
-        yAxis = Math3D.cross(zAxis,xAxis)
+        # Up
+        yAxis = self.up
 
-        orientation = Math3D.Mat4x4(array=[
-                                           Math3D.Vec4(xAxis.x(), xAxis.y(), xAxis.z(), -self.position.x()),
-                                           Math3D.Vec4(yAxis.x(), yAxis.y(), yAxis.z(), -self.position.y()),
-                                           Math3D.Vec4(zAxis.x(), zAxis.y(), zAxis.z(), -self.position.z()),
-                                           Math3D.Vec4(w=1)
-                                          ])
+        output = Math3D.Mat4x4(array=[
+                                      Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
+                                      Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
+                                      Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+                                      Math3D.Vec4(Math3D.dot(xAxis, self.position),
+                                                  Math3D.dot(yAxis, self.position),
+                                                  Math3D.dot(zAxis, self.position),
+                                                  1)])
 
-        positionMat = Math3D.Mat4x4()
-        positionMat.matrix[3] = (Math3D.Vec4(-self.position.x(), -self.position.y(), -self.position.z(), 1))
+        return (output)
 
-        return (orientation*positionMat)
-
-    def createProjMat(self, fov : int = 90) -> Math3D.Mat4x4:
+    def createProjMat(self, fov: int = 90) -> Math3D.Mat4x4:
         scale = fov/2
-        scale = radians(scale)
+        scale = radians(scale).real
         scale = 1/tan(scale).real
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
@@ -168,21 +168,36 @@ def Draw(scene: Scene) -> bool:
     if(len(scene.gameObjects) <= 0 or not scene.Refresh):
         return False
 
-    projMat = Math3D.lookAt()
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
         scene.Refresh = False
         FinalMat = gObj.transform
-        FinalMat = FinalMat*scene.Camera.createLookat()
         FinalMat = FinalMat*scene.Camera.createProjMat()
+        FinalMat = FinalMat*scene.Camera.createLookat()
         for point in gObj.myMesh.points:
+            print("--")
+            print("cameraPos")
+            print(scene.Camera.position.x(), " ", scene.Camera.position.y(),
+                  " ", scene.Camera.position.z())
+            print("Local")
+            tempPoint = point
+            print(tempPoint.z())
+            print("World")
+            tempPoint = tempPoint*gObj.transform
+            print(tempPoint.z())
+            print("Camera")
+            tempPoint = tempPoint*scene.Camera.createLookat()
+            print(tempPoint.z())
+            print("Screen")
+            tempPoint = tempPoint*scene.Camera.createProjMat()
+            print(tempPoint.z())
+            print("--")
             newPoint = point*FinalMat
-            if newPoint[3] is not 1:
+            if newPoint[3] != 1:
                 newPoint[0] = newPoint[0]/newPoint[3]
                 newPoint[1] = newPoint[1]/newPoint[3]
                 newPoint[2] = newPoint[2]/newPoint[3]
                 newPoint[3] = 1
 
             gObj.myMesh.ProjectedPoints.append(newPoint)
-
     return True
