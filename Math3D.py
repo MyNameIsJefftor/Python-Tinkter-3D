@@ -114,6 +114,18 @@ class Vec4():
 
         return None
 
+    def convertToVec3(self, Cut: int = 3) -> Vec3:
+        if Cut > 3 or Cut < 0:
+            raise Exception("Tried Cutting outside the bounds convertToVec3")
+
+        output = []
+        for x in range(4):
+            if x == Cut:
+                continue
+            output.append(self.array[x].__float__())
+        output = Vec3(output[0], output[1], output[2])
+        return output
+
 
 # each vector is a row
 class Mat3x3():
@@ -159,6 +171,14 @@ class Mat3x3():
                 return False
         return True
 
+    def determinate(self) -> float:
+        mat = self.matrix
+        output = mat[0][0] * determinant2x2(mat[1][1], mat[1][2], mat[2][1], mat[2][2])
+        output = output - mat[0][1] * determinant2x2(mat[1][0], mat[1][2], mat[2][0], mat[2][2])
+        output = output + mat[0][2] * determinant2x2(mat[1][0], mat[1][1], mat[2][0], mat[2][1])
+
+        return output
+
     __slots__ = ['matrix']
 
 
@@ -202,6 +222,33 @@ class Mat4x4():
             return storage
 
         return None
+
+    # Cut a row and column off to create a 3x3 matrix
+    def createSub3x3(self, cutRow: int = 3, cutCol: int = 3) -> Mat3x3:
+
+        output = []
+        for row in range(4):
+            if row == cutRow:
+                continue
+
+            output.append(self.matrix[row].convertToVec3(cutCol))
+
+        output = Mat3x3(array=[output[0], output[1], output[2]])
+
+        return output
+
+    def determinate(self) -> float:
+        arr = [Mat3x3()]
+        arr.clear()
+        for x in range(4):
+            arr.append(self.createSub3x3(0, x))
+
+        output = self.matrix[0][0] * arr[0].determinate()
+        output = output - self.matrix[0][1] * arr[1].determinate()
+        output = output + self.matrix[0][2] * arr[2].determinate()
+        output = output - self.matrix[0][3] * arr[3].determinate()
+
+        return output
 
     __slots__ = ["matrix"]
 
@@ -266,6 +313,13 @@ def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
                            Vec4(0, 0, A, -1),
                            Vec4(0, 0, B, 0)])
     return output
+
+
+# ExtraMatrix Functions
+def determinant2x2(topLeft: float = 0, topRight: float = 0,
+                   botLeft: float = 0, botRight: float = 0) -> float:
+
+    return (topLeft * botRight) - (topRight * botLeft)
 
 
 # right Handed

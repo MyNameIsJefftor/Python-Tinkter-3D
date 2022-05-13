@@ -62,6 +62,38 @@ class testMat(unittest.TestCase):
         voidMath.RotateZ(mat, 90)
         self.assertEqual(mat, rotmat)
 
+    def test_2x2Determinant(self):
+        det = voidMath.determinant2x2(2, 3, 1, -2)
+        self.assertEqual(det, -7)
+
+    def test_3x3Determinant(self):
+        mat = voidMath.Mat3x3(array=[voidMath.Vec3(5, 0, 3),
+                                     voidMath.Vec3(2, 3, 5),
+                                     voidMath.Vec3(1, -2, 3)])
+        det = mat.determinate()
+        self.assertEqual(det, 74)
+
+    def test_CreateSub3x3From4x4(self):
+        mat4 = voidMath.Mat4x4()
+        matConv = mat4.createSub3x3()
+        mat3 = voidMath.Mat3x3()
+        self.assertEqual(mat3, matConv)
+
+    def test_4x4Determinant(self):
+        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 4, -6),
+                                     voidMath.Vec4(2, 5, 0, 3),
+                                     voidMath.Vec4(-1, 2, 3, 5),
+                                     voidMath.Vec4(2, 1, -2, 3)])
+        det = mat.determinate()
+        self.assertEqual(det, 318)
+
+
+class testVec(unittest.TestCase):
+    def test_Convert4to3(self):
+        vec4 = voidMath.Vec4(w=1).convertToVec3()
+        vec3 = voidMath.Vec3()
+        self.assertEqual(vec4, vec3)
+
 
 if __name__ == "__main__":
     unittest.main()

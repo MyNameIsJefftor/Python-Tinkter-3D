@@ -70,13 +70,13 @@ class Camera:
 
         return (output)
 
-    def createProjMat(self, fov: int = 90) -> Math3D.Mat4x4:
+    def createProjMat(self, fov: int = 90, aspectRatio: float = 1.0) -> Math3D.Mat4x4:
         scale = fov/2
         scale = radians(scale).real
         scale = 1/tan(scale).real
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
-        output = Math3D.Mat4x4(array=[Math3D.Vec4(scale, 0, 0, 0),
+        output = Math3D.Mat4x4(array=[Math3D.Vec4(scale * aspectRatio, 0, 0, 0),
                                       Math3D.Vec4(0, scale, 0, 0),
                                       Math3D.Vec4(0, 0, extraVal1, -1),
                                       Math3D.Vec4(0, 0, extraVal2, 0)])
