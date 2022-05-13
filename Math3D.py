@@ -250,6 +250,23 @@ class Mat4x4():
 
         return output
 
+    # Row become Columns
+    def transpose(self) -> Mat4x4:
+        mat = self.matrix
+        return Mat4x4(array=[Vec4(mat[0][0], mat[1][0], mat[2][0], mat[3][0]),
+                             Vec4(mat[0][1], mat[1][1], mat[2][1], mat[3][1]),
+                             Vec4(mat[0][2], mat[1][2], mat[2][2], mat[3][2]),
+                             Vec4(mat[0][3], mat[1][3], mat[2][3], mat[3][3])])
+
+    def inverse(self) -> Mat4x4:
+        output = Mat4x4()
+        for row in range(4):
+            for col in range(4):
+                output[row][col] = self.createSub3x3(row, col).determinate()*0.5
+
+        output = output.transpose()
+        return output
+
     __slots__ = ["matrix"]
 
 

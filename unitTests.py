@@ -87,6 +87,35 @@ class testMat(unittest.TestCase):
         det = mat.determinate()
         self.assertEqual(det, 318)
 
+    def test_4x4Transpose(self):
+        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 2, 3, 4),
+                                     voidMath.Vec4(5, 6, 7, 8),
+                                     voidMath.Vec4(9, 10, 11, 12),
+                                     voidMath.Vec4(13, 14, 15, 16)])
+
+        mat = mat.transpose()
+
+        otherMat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 5, 9, 13),
+                                          voidMath.Vec4(2, 6, 10, 14),
+                                          voidMath.Vec4(3, 7, 11, 15),
+                                          voidMath.Vec4(4, 8, 12, 16)])
+
+        self.assertEqual(mat, otherMat)
+
+    def test_4x4Inverse(self):
+        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 2, 3, 4),
+                                     voidMath.Vec4(5, 6, 7, 8),
+                                     voidMath.Vec4(9, 10, 11, 12),
+                                     voidMath.Vec4(13, 14, 15, 16)])
+
+        # Get inverse
+        otherMat = mat.inverse()
+
+        # Multiply the inverse by the original. Should give Identity
+        mat = mat * otherMat
+
+        self.assertEqual(mat, voidMath.Mat4x4())
+
 
 class testVec(unittest.TestCase):
     def test_Convert4to3(self):
