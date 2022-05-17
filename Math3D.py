@@ -276,29 +276,32 @@ class Mat4x4():
         output = output.transpose()
         return output
 
-    # Right Handed Rotations
-    def RotateX(self, angle: float) -> None:
-        angle = radians(angle)
-        rotationMatrix = Mat4x4()
-        rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
-        rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
-        self.matrix *= rotationMatrix
-
-    def RotateY(self, angle: float) -> None:
-        angle = radians(angle)
-        rotationMatrix = Mat4x4()
-        rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
-        rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
-        self.matrix *= rotationMatrix
-
-    def RotateZ(self, angle: float) -> None:
-        angle = radians(angle)
-        rotationMatrix = Mat4x4()
-        rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
-        rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
-        self.matrix *= rotationMatrix
-
     __slots__ = ["matrix"]
+
+
+# Right Handed Rotations
+def RotateX(mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
+    rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
+    mat *= rotationMatrix
+
+
+def RotateY(mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
+    rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
+    mat *= rotationMatrix
+
+
+def RotateZ(mat: Mat4x4, angle: float) -> None:
+    angle = radians(angle)
+    rotationMatrix = Mat4x4()
+    rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
+    rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
+    mat *= rotationMatrix
 
 
 def cross(vec1: Vec4, vec2: Vec4) -> Vec4:

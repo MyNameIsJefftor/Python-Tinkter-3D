@@ -1,5 +1,5 @@
 import tkinter as tk
-from Math3D import Vec4
+from Math3D import Vec4, RotateY
 import VoidPython as VP
 import keyboard
 
@@ -29,7 +29,7 @@ def Main():
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
     cubeObj.myMesh = VP.CreateCube()
-    # RotateX(cubeObj.transform, 45.0)
+    RotateY(cubeObj.transform.Matrix, 45.0)
     primeScene.addObject(cubeObj)
 
     # Setup inputs

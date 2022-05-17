@@ -14,7 +14,10 @@ class Mesh():
 class Transform():
     def __init__(self, parent=None):
         self.parent = parent
-        self.Matrix = Math3D.Mat4x4()
+        self.Matrix = Math3D.Mat4x4(array=[Math3D.Vec4(1, 0, 0, 0),
+                                           Math3D.Vec4(0, 1, 0, 0),
+                                           Math3D.Vec4(0, 0, 1, 0),
+                                           Math3D.Vec4(0, 0, 0, 1)])
         self.Position = Math3D.Vec4()
         self.Rotation = Math3D.Vec4()
 
@@ -32,30 +35,30 @@ class Camera:
         self.far = farPlane
 
     def MovePosX(self):
-        self.position = self.position + Math3D.Vec4(x=0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(x=0.1)
 
     def MoveNegX(self):
-        self.position = self.position + Math3D.Vec4(x=-0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(x=-0.1)
 
     def MovePosY(self):
-        self.position = self.position + Math3D.Vec4(y=0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(y=0.1)
 
     def MoveNegY(self):
-        self.position = self.position + Math3D.Vec4(y=-0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(y=-0.1)
 
     def MovePosZ(self):
-        self.position = self.position + Math3D.Vec4(z=0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(z=0.1)
 
     def MoveNegZ(self):
-        self.position = self.position + Math3D.Vec4(z=-0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(z=-0.1)
 
     def createLookat(self,
                      target: Math3D.Vec4 = Math3D.Vec4(0, 0, 1, 0)) -> Math3D.Mat4x4:
         # Look
-        zAxis = Math3D.normalize(self.transform.Position - target)
+        zAxis = (self.transform.Position - target).normalize()
 
         # Right
-        xAxis = Math3D.normalize(Math3D.cross(Math3D.Vec4(0, 1, 0, 0), zAxis))
+        xAxis = (Math3D.cross(Math3D.Vec4(0, 1, 0, 0), zAxis)).normalize()
 
         # Up
         yAxis = Math3D.Vec4(0, 1, 0, 0)
@@ -89,12 +92,7 @@ class Camera:
 class gameObject:
     def __init__(self) -> None:
         self.myMesh = Mesh()
-        self.transform = Math3D.Mat4x4()
-
-    def updateMesh(self) -> None:
-        for point in self.myMesh.points:
-            point = self.transform * point
-        return
+        self.transform = Transform()
 
 
 class Scene:
@@ -174,7 +172,7 @@ def Draw(scene: Scene) -> bool:
         gObj.myMesh.ProjectedPoints.clear()
         scene.Refresh = False
         for point in gObj.myMesh.points:
-            newPoint = point*gObj.transform
+            newPoint = point*gObj.transform.Matrix
             newPoint = newPoint*scene.Camera.createLookat().inverse()
             newPoint = newPoint*scene.Camera.createProjMat()
             if newPoint[3] != 1:
