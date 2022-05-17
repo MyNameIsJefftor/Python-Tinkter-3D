@@ -1,6 +1,7 @@
 import tkinter as tk
 from Math3D import Vec4
 import VoidPython as VP
+import keyboard
 
 
 class application(tk.Frame):
@@ -32,12 +33,13 @@ def Main():
     primeScene.addObject(cubeObj)
 
     # Setup inputs
-    VP.onKeyPress("w", primeScene.MoveCameraNegZ)
-    VP.onKeyPress("s", primeScene.MoveCameraPosZ)
-    VP.onKeyPress("a", primeScene.MoveCameraPosX)
-    VP.onKeyPress("d", primeScene.MoveCameraNegX)
-    VP.onKeyPress("q", primeScene.MoveCameraPosY)
-    VP.onKeyPress("e", primeScene.MoveCameraNegY)
+    keyboard.on_press_key("w", primeScene.MoveCameraNegZ)
+    keyboard.on_press_key("s", primeScene.MoveCameraPosZ)
+    keyboard.on_press_key("a", primeScene.MoveCameraPosX)
+    keyboard.on_press_key("d", primeScene.MoveCameraNegX)
+    keyboard.on_press_key("q", primeScene.MoveCameraPosY)
+    keyboard.on_press_key("e", primeScene.MoveCameraNegY)
+
     while primApp.windowOpen:
         if VP.Draw(primeScene):
             primApp.canvas.delete('all')

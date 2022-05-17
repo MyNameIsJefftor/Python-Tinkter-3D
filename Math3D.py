@@ -1,5 +1,5 @@
 from __future__ import annotations
-from math import cos, sin, radians, sqrt, tan
+from math import cos, sin, radians, sqrt
 
 
 class Vec3():
@@ -318,40 +318,8 @@ def dot(vec1: Vec4, vec2: Vec4) -> float:
     return vec1.x()*vec2.x() + vec1.y()*vec2.y() + vec1.z()*vec2.z()
 
 
-# right handed Proj
-def createProjectionMatrix(FOV: float = 90, Far: int = 10, Near: int = 1):
-    Scale = 1/tan(radians(FOV/2))
-
-    A = -(Far/(Far-Near))
-    B = -(Far*Near)/(Far-Near)
-
-    output = Mat4x4(array=[Vec4(Scale, 0, 0, 0),
-                           Vec4(0, Scale, 0, 0),
-                           Vec4(0, 0, A, -1),
-                           Vec4(0, 0, B, 0)])
-    return output
-
-
 # ExtraMatrix Functions
 def determinant2x2(topLeft: float = 0, topRight: float = 0,
                    botLeft: float = 0, botRight: float = 0) -> float:
 
     return (topLeft * botRight) - (topRight * botLeft)
-
-
-# right Handed
-def lookAt(Eye: Vec3 = Vec3(0, 0, 0), Target: Vec3 = Vec3(0, 0, -1),
-           up: Vec3 = Vec3(0, 1, 0)):
-    zAxis = normalize(Eye - Target)
-    xAxis = normalize(cross(up, zAxis))
-    yAxis = cross(zAxis, xAxis)
-
-    orientation = Mat4x4(array=[Vec4(xAxis.x(), yAxis.x(), -zAxis.x(), 0),
-                                Vec4(xAxis.y(), yAxis.y(), -zAxis.y(), 0),
-                                Vec4(xAxis.z(), yAxis.z(), -zAxis.z(), 0),
-                                Vec4(0, 0, 0, 1)])
-
-    position = Mat4x4()
-    position.matrix[3] = (Vec4(-Eye.x(), -Eye.y(), -Eye.z(), 1))
-
-    return (orientation*position)

@@ -22,13 +22,14 @@ class Transform():
 class Camera:
     def __init__(self, position=Math3D.Vec4(),
                  nearPlane=1, farPlane=10) -> None:
-        self.transform = None
+
+        trans = Transform()
+        trans.Position = position
+        trans.Matrix = Math3D.Mat4x4()
+        trans.Matrix[3] = position
+        self.transform = trans
         self.near = nearPlane
         self.far = farPlane
-        self.target = Math3D.Vec4
-        self.position = position
-        self.up = Math3D.Vec4(0, 1)
-        self.right = Math3D.Vec4(1)
 
     def MovePosX(self):
         self.position = self.position + Math3D.Vec4(x=0.1)
@@ -51,34 +52,35 @@ class Camera:
     def createLookat(self,
                      target: Math3D.Vec4 = Math3D.Vec4(0, 0, 1, 0)) -> Math3D.Mat4x4:
         # Look
-        zAxis = Math3D.normalize(self.position - target)
+        zAxis = Math3D.normalize(self.transform.Position - target)
 
         # Right
-        xAxis = Math3D.normalize(Math3D.cross(self.up, zAxis))
+        xAxis = Math3D.normalize(Math3D.cross(Math3D.Vec4(0, 1, 0, 0), zAxis))
 
         # Up
-        yAxis = self.up
+        yAxis = Math3D.Vec4(0, 1, 0, 0)
 
         output = Math3D.Mat4x4(array=[
                                       Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
                                       Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
                                       Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
-                                      Math3D.Vec4(Math3D.dot(xAxis, self.position),
-                                                  Math3D.dot(yAxis, self.position),
-                                                  Math3D.dot(zAxis, self.position),
+                                      Math3D.Vec4(Math3D.dot(xAxis, self.transform.Position),
+                                                  Math3D.dot(yAxis, self.transform.Position),
+                                                  Math3D.dot(zAxis, self.transform.Position),
                                                   1)])
 
         return (output)
 
     def createProjMat(self, fov: int = 90, aspectRatio: float = 1.0) -> Math3D.Mat4x4:
-        scale = fov/2
-        scale = radians(scale).real
-        scale = 1/tan(scale).real
+        yScale = fov/2
+        yScale = radians(yScale)
+        yScale = 1/tan(yScale).real
+        xScale = yScale * aspectRatio
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
-        output = Math3D.Mat4x4(array=[Math3D.Vec4(scale * aspectRatio, 0, 0, 0),
-                                      Math3D.Vec4(0, scale, 0, 0),
-                                      Math3D.Vec4(0, 0, extraVal1, -1),
+        output = Math3D.Mat4x4(array=[Math3D.Vec4(xScale, 0, 0, 0),
+                                      Math3D.Vec4(0, yScale, 0, 0),
+                                      Math3D.Vec4(0, 0, extraVal1, 1),
                                       Math3D.Vec4(0, 0, extraVal2, 0)])
 
         return output
@@ -171,33 +173,14 @@ def Draw(scene: Scene) -> bool:
     for gObj in scene.gameObjects:
         gObj.myMesh.ProjectedPoints.clear()
         scene.Refresh = False
-        FinalMat = gObj.transform
-        FinalMat = FinalMat*scene.Camera.createProjMat()
-        FinalMat = FinalMat*scene.Camera.createLookat()
         for point in gObj.myMesh.points:
-            print("--")
-            print("cameraPos")
-            print(scene.Camera.position.x(), " ", scene.Camera.position.y(),
-                  " ", scene.Camera.position.z())
-            print("Local")
-            tempPoint = point
-            print(tempPoint.z())
-            print("World")
-            tempPoint = tempPoint*gObj.transform
-            print(tempPoint.z())
-            print("Camera")
-            tempPoint = tempPoint*scene.Camera.createLookat()
-            print(tempPoint.z())
-            print("Screen")
-            tempPoint = tempPoint*scene.Camera.createProjMat()
-            print(tempPoint.z())
-            print("--")
-            newPoint = point*FinalMat
+            newPoint = point*gObj.transform
+            newPoint = newPoint*scene.Camera.createLookat().inverse()
+            newPoint = newPoint*scene.Camera.createProjMat()
             if newPoint[3] != 1:
                 newPoint[0] = newPoint[0]/newPoint[3]
                 newPoint[1] = newPoint[1]/newPoint[3]
                 newPoint[2] = newPoint[2]/newPoint[3]
-                newPoint[3] = 1
 
             gObj.myMesh.ProjectedPoints.append(newPoint)
     return True
