@@ -114,6 +114,15 @@ class Vec4():
 
         return None
 
+    # Vector Math
+    def normalize(self) -> Vec4:
+        mag = sqrt((self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z()))
+        output = Vec4()
+        output[0] = self[0] / mag
+        output[1] = self[1] / mag
+        output[2] = self[2] / mag
+        return output
+
     def convertToVec3(self, Cut: int = 3) -> Vec3:
         if Cut > 3 or Cut < 0:
             raise Exception("Tried Cutting outside the bounds convertToVec3")
@@ -267,42 +276,29 @@ class Mat4x4():
         output = output.transpose()
         return output
 
+    # Right Handed Rotations
+    def RotateX(self, angle: float) -> None:
+        angle = radians(angle)
+        rotationMatrix = Mat4x4()
+        rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
+        rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
+        self.matrix *= rotationMatrix
+
+    def RotateY(self, angle: float) -> None:
+        angle = radians(angle)
+        rotationMatrix = Mat4x4()
+        rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
+        rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
+        self.matrix *= rotationMatrix
+
+    def RotateZ(self, angle: float) -> None:
+        angle = radians(angle)
+        rotationMatrix = Mat4x4()
+        rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
+        rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
+        self.matrix *= rotationMatrix
+
     __slots__ = ["matrix"]
-
-
-# Right Handed Rotations
-def RotateX(Mat: Mat4x4, angle: float) -> None:
-    angle = radians(angle)
-    rotationMatrix = Mat4x4()
-    rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
-    rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
-    Mat *= rotationMatrix
-
-
-def RotateY(Mat: Mat4x4, angle: float) -> None:
-    angle = radians(angle)
-    rotationMatrix = Mat4x4()
-    rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
-    rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
-    Mat *= rotationMatrix
-
-
-def RotateZ(Mat: Mat4x4, angle: float) -> None:
-    angle = radians(angle)
-    rotationMatrix = Mat4x4()
-    rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
-    rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
-    Mat *= rotationMatrix
-
-
-# Vector Math
-def normalize(vec: Vec4) -> Vec4:
-    mag = sqrt((vec.x() * vec.x()) + (vec.y() * vec.y()) + (vec.z() * vec.z()))
-    output = Vec4()
-    output[0] = vec[0] / mag
-    output[1] = vec[1] / mag
-    output[2] = vec[2] / mag
-    return output
 
 
 def cross(vec1: Vec4, vec2: Vec4) -> Vec4:
