@@ -136,10 +136,10 @@ class testGraphics(unittest.TestCase):
     def test_TransformMove(self):
         transform = VP.Transform()
         translate = voidMath.Vec4(1, 0, 0, 1)
-        realMat = voidMath.Mat4x4(voidMath.Vec4(1, 0, 0, 0),
-                                  voidMath.Vec4(0, 1, 0, 0),
-                                  voidMath.Vec4(0, 0, 1, 0),
-                                  voidMath.Vec4(1, 0, 0, 1))
+        realMat = voidMath.Mat4x4(1, 0, 0, 0,
+                                  0, 1, 0, 0,
+                                  0, 0, 1, 0,
+                                  1, 0, 0, 1)
         transform.Translate(translate)
         self.assertEqual(transform.Matrix, realMat)
         self.assertEqual(transform.Position(), translate)

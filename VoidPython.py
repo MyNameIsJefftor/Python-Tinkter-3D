@@ -14,13 +14,10 @@ class Mesh():
 class Transform():
     def __init__(self, parent=None):
         self.parent = parent
-        self.Matrix = Math3D.Mat4x4(Math3D.Vec4(1, 0, 0, 0),
-                                    Math3D.Vec4(0, 1, 0, 0),
-                                    Math3D.Vec4(0, 0, 1, 0),
-                                    Math3D.Vec4(0, 0, 0, 1))
+        self.Matrix = Math3D.Mat4x4()
 
     def Translate(self, vec: Math3D.Vec4) -> None:
-        self.Matrix[3] += vec
+        self.Matrix[3] = vec
 
     def Position(self) -> Math3D.Vec4:
         return self.Matrix[3]

@@ -294,7 +294,9 @@ class Mat4x4():
         output = Mat4x4()
         for row in range(4):
             for col in range(4):
-                output[row][col] = ((self.createSub3x3(row, col).determinate())*pow(-1, row + col))/det
+                output[row][col] = self.createSub3x3(row, col).determinate()
+                output[row][col] *= pow(-1, row + col)
+                output[row][col] /= det
 
         return output
 
