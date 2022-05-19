@@ -1,14 +1,21 @@
 from __future__ import annotations
 import Math3D as voidMath
+import VoidPython as VP
 import unittest
 
 
-class testMat(unittest.TestCase):
+class testMath(unittest.TestCase):
+
     def test_vec3timesMat3x3(self):
         basemat = voidMath.Mat3x3()
         vec = voidMath.Vec4(5, 6, 4, 8)
         vec = vec*basemat
         self.assertEqual(vec, voidMath.Vec4(5, 6, 4, 8))
+
+    def test_Convert4to3(self):
+        vec4 = voidMath.Vec4(w=1).convertToVec3()
+        vec3 = voidMath.Vec3()
+        self.assertEqual(vec4, vec3)
 
     def test_mat3x3SelfMul(self):
         mat1 = voidMath.Mat3x3()
@@ -117,11 +124,25 @@ class testMat(unittest.TestCase):
         self.assertEqual(mat, voidMath.Mat4x4())
 
 
-class testVec(unittest.TestCase):
-    def test_Convert4to3(self):
-        vec4 = voidMath.Vec4(w=1).convertToVec3()
-        vec3 = voidMath.Vec3()
-        self.assertEqual(vec4, vec3)
+class testGraphics(unittest.TestCase):
+
+    def test_TransformCreation(self):
+        transform = VP.Transform()
+        IdentiyMat = voidMath.Mat4x4()
+        defaultPos = voidMath.Vec4(0, 0, 0, 1)
+        self.assertEqual(transform.Matrix, IdentiyMat)
+        self.assertEqual(transform.Position(), defaultPos)
+
+    def test_TransformMove(self):
+        transform = VP.Transform()
+        translate = voidMath.Vec4(1, 0, 0, 1)
+        realMat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 0, 0),
+                                         voidMath.Vec4(0, 1, 0, 0),
+                                         voidMath.Vec4(0, 0, 1, 0),
+                                         voidMath.Vec4(1, 0, 0, 1)])
+        transform.Translate(translate)
+        self.assertEqual(transform.Matrix, realMat)
+        self.assertEqual(transform.Position(), translate)
 
 
 if __name__ == "__main__":

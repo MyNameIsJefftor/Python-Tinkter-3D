@@ -18,8 +18,12 @@ class Transform():
                                            Math3D.Vec4(0, 1, 0, 0),
                                            Math3D.Vec4(0, 0, 1, 0),
                                            Math3D.Vec4(0, 0, 0, 1)])
-        self.Position = Math3D.Vec4()
-        self.Rotation = Math3D.Vec4()
+
+    def Translate(self, vec: Math3D.Vec4) -> None:
+        self.Matrix[3] += vec
+
+    def Position(self) -> Math3D.Vec4:
+        return self.Matrix[3]
 
 
 class Camera:
