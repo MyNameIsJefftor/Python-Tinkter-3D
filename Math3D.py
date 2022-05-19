@@ -38,9 +38,7 @@ class Vec3():
 
 
 class Vec4():
-    def __init__(self,
-                 x: float = 0.0, y: float = 0, z: float = 0,
-                 w: float = 0) -> None:
+    def __init__(self, x: float = 0, y: float = 0, z: float = 0, w: float = 0) -> None:
         self.array = [x, y, z, w]
 
     def x(self) -> float:
@@ -138,10 +136,14 @@ class Vec4():
 
 # each vector is a row
 class Mat3x3():
-    def __init__(self, array=[Vec3(1, 0, 0),
-                              Vec3(0, 1, 0),
-                              Vec3(0, 0, 1)]) -> None:
-        self.matrix = array
+    def __init__(self,
+                 A0=1, A1=0, A2=0,
+                 B0=0, B1=1, B2=0,
+                 C0=0, C1=0, C2=1) -> None:
+
+        self.matrix = [Vec3(A0, A1, A2),
+                       Vec3(B0, B1, B2),
+                       Vec3(C0, C1, C2)]
 
     def __getitem__(self, key):
         return self.matrix[key]
@@ -151,7 +153,7 @@ class Mat3x3():
         if not isinstance(other, Mat3x3):
             return None
 
-        output = Mat3x3(array=[Vec3(), Vec3(), Vec3()])
+        output = Mat3x3(Vec3(), Vec3(), Vec3())
         for a in range(0, 3):
             for b in range(0, 3):
                 for c in range(0, 3):
@@ -164,7 +166,8 @@ class Mat3x3():
         if not isinstance(other, Mat3x3):
             return None
 
-        output = Mat3x3(array=[Vec3(), Vec3(), Vec3()])
+        output = Mat3x3()
+        output.blank()
         for a in range(0, 3):
             for b in range(0, 3):
                 for c in range(0, 3):
@@ -180,6 +183,12 @@ class Mat3x3():
                 return False
         return True
 
+    # Blanks the Matrix to all zeros
+    def blank(self) -> None:
+        for row in range(3):
+            for col in range(3):
+                self.matrix[row][col] = 0
+
     def determinate(self) -> float:
         mat = self.matrix
         output = mat[0][0] * determinant2x2(mat[1][1], mat[1][2], mat[2][1], mat[2][2])
@@ -192,11 +201,16 @@ class Mat3x3():
 
 
 class Mat4x4():
-    def __init__(self, array=[Vec4(1, 0, 0, 0),
-                              Vec4(0, 1, 0, 0),
-                              Vec4(0, 0, 1, 0),
-                              Vec4(0, 0, 0, 1)]) -> None:
-        self.matrix = array
+    def __init__(self,
+                 A0=1, A1=0, A2=0, A3=0,
+                 B0=0, B1=1, B2=0, B3=0,
+                 C0=0, C1=0, C2=1, C3=0,
+                 D0=0, D1=0, D2=0, D3=1) -> None:
+
+        self.matrix = [Vec4(A0, A1, A2, A3),
+                       Vec4(B0, B1, B2, B3),
+                       Vec4(C0, C1, C2, C3),
+                       Vec4(D0, D1, D2, D3)]
 
     def __getitem__(self, key):
         return self.matrix[key]
@@ -214,10 +228,8 @@ class Mat4x4():
 
     def __mul__(self, other: Mat4x4) -> Mat4x4:
         if isinstance(other, Mat4x4):
-            output = Mat4x4(array=[Vec4(),
-                                   Vec4(),
-                                   Vec4(),
-                                   Vec4()])
+            output = Mat4x4()
+            output.blank()
             for a in range(0, 4):
                 for b in range(0, 4):
                     for c in range(0, 4):
@@ -232,6 +244,12 @@ class Mat4x4():
 
         return None
 
+    # Blanks the matrix back to all zeros
+    def blank(self) -> None:
+        for row in range(4):
+            for col in range(4):
+                self.matrix[row][col] = 0
+
     # Cut a row and column off to create a 3x3 matrix
     def createSub3x3(self, cutRow: int = 3, cutCol: int = 3) -> Mat3x3:
 
@@ -242,7 +260,9 @@ class Mat4x4():
 
             output.append(self.matrix[row].convertToVec3(cutCol))
 
-        output = Mat3x3(array=[output[0], output[1], output[2]])
+        output = Mat3x3(output[0][0], output[0][1], output[0][2],
+                        output[1][0], output[1][1], output[1][2],
+                        output[2][0], output[2][1], output[2][2])
 
         return output
 
@@ -262,46 +282,48 @@ class Mat4x4():
     # Row become Columns
     def transpose(self) -> Mat4x4:
         mat = self.matrix
-        return Mat4x4(array=[Vec4(mat[0][0], mat[1][0], mat[2][0], mat[3][0]),
-                             Vec4(mat[0][1], mat[1][1], mat[2][1], mat[3][1]),
-                             Vec4(mat[0][2], mat[1][2], mat[2][2], mat[3][2]),
-                             Vec4(mat[0][3], mat[1][3], mat[2][3], mat[3][3])])
+        return Mat4x4(mat[0][0], mat[1][0], mat[2][0], mat[3][0],
+                      mat[0][1], mat[1][1], mat[2][1], mat[3][1],
+                      mat[0][2], mat[1][2], mat[2][2], mat[3][2],
+                      mat[0][3], mat[1][3], mat[2][3], mat[3][3])
 
     def inverse(self) -> Mat4x4:
+        det = self.determinate()
+        if det == 0:
+            return
         output = Mat4x4()
         for row in range(4):
             for col in range(4):
-                output[row][col] = self.createSub3x3(row, col).determinate()*0.5
+                output[row][col] = ((self.createSub3x3(row, col).determinate())*pow(-1, row + col))/det
 
-        output = output.transpose()
         return output
 
     __slots__ = ["matrix"]
 
 
 # Right Handed Rotations
-def RotateX(mat: Mat4x4, angle: float) -> None:
+def RotateX(mat: Mat4x4, angle: float) -> Mat4x4:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
     rotationMatrix[1] = Vec4(0, cos(angle), -sin(angle), 0)
     rotationMatrix[2] = Vec4(0, sin(angle), cos(angle), 0)
-    mat *= rotationMatrix
+    return mat * rotationMatrix
 
 
-def RotateY(mat: Mat4x4, angle: float) -> None:
+def RotateY(mat: Mat4x4, angle: float) -> Mat4x4:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
     rotationMatrix[0] = Vec4(cos(angle), 0, sin(angle), 0)
     rotationMatrix[2] = Vec4(-sin(angle), 0, cos(angle), 0)
-    mat *= rotationMatrix
+    return mat * rotationMatrix
 
 
-def RotateZ(mat: Mat4x4, angle: float) -> None:
+def RotateZ(mat: Mat4x4, angle: float) -> Mat4x4:
     angle = radians(angle)
     rotationMatrix = Mat4x4()
     rotationMatrix[0] = Vec4(cos(angle), -sin(angle), 0, 0)
     rotationMatrix[1] = Vec4(sin(angle), cos(angle), 0, 0)
-    mat *= rotationMatrix
+    return mat * rotationMatrix
 
 
 def cross(vec1: Vec4, vec2: Vec4) -> Vec4:

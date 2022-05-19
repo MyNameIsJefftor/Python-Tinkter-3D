@@ -14,10 +14,10 @@ class Mesh():
 class Transform():
     def __init__(self, parent=None):
         self.parent = parent
-        self.Matrix = Math3D.Mat4x4(array=[Math3D.Vec4(1, 0, 0, 0),
-                                           Math3D.Vec4(0, 1, 0, 0),
-                                           Math3D.Vec4(0, 0, 1, 0),
-                                           Math3D.Vec4(0, 0, 0, 1)])
+        self.Matrix = Math3D.Mat4x4(Math3D.Vec4(1, 0, 0, 0),
+                                    Math3D.Vec4(0, 1, 0, 0),
+                                    Math3D.Vec4(0, 0, 1, 0),
+                                    Math3D.Vec4(0, 0, 0, 1))
 
     def Translate(self, vec: Math3D.Vec4) -> None:
         self.Matrix[3] += vec
@@ -67,14 +67,13 @@ class Camera:
         # Up
         yAxis = Math3D.Vec4(0, 1, 0, 0)
 
-        output = Math3D.Mat4x4(array=[
-                                      Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
-                                      Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
-                                      Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
-                                      Math3D.Vec4(Math3D.dot(xAxis, self.transform.Position),
-                                                  Math3D.dot(yAxis, self.transform.Position),
-                                                  Math3D.dot(zAxis, self.transform.Position),
-                                                  1)])
+        output = Math3D.Mat4x4(Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
+                               Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
+                               Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
+                               Math3D.Vec4(Math3D.dot(xAxis, self.transform.Position),
+                                           Math3D.dot(yAxis, self.transform.Position),
+                                           Math3D.dot(zAxis, self.transform.Position),
+                                           1))
 
         return (output)
 
@@ -85,10 +84,10 @@ class Camera:
         xScale = yScale * aspectRatio
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
-        output = Math3D.Mat4x4(array=[Math3D.Vec4(xScale, 0, 0, 0),
-                                      Math3D.Vec4(0, yScale, 0, 0),
-                                      Math3D.Vec4(0, 0, extraVal1, 1),
-                                      Math3D.Vec4(0, 0, extraVal2, 0)])
+        output = Math3D.Mat4x4(Math3D.Vec4(xScale, 0, 0, 0),
+                               Math3D.Vec4(0, yScale, 0, 0),
+                               Math3D.Vec4(0, 0, extraVal1, 1),
+                               Math3D.Vec4(0, 0, extraVal2, 0))
 
         return output
 

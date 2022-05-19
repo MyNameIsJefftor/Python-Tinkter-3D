@@ -19,9 +19,9 @@ class testMath(unittest.TestCase):
 
     def test_mat3x3SelfMul(self):
         mat1 = voidMath.Mat3x3()
-        mat2 = voidMath.Mat3x3(array=[voidMath.Vec3(1, 1, 1),
-                                      voidMath.Vec3(2, 2, 2),
-                                      voidMath.Vec3(3, 3, 3)])
+        mat2 = voidMath.Mat3x3(1, 1, 1,
+                               2, 2, 2,
+                               3, 3, 3)
         target = mat2
 
         output = mat1 * mat2
@@ -30,10 +30,10 @@ class testMath(unittest.TestCase):
 
     def test_mat4x4SelfMul(self):
         mat1 = voidMath.Mat4x4()
-        mat2 = voidMath.Mat4x4(array=[voidMath.Vec4(1, 1, 1, 1),
-                                      voidMath.Vec4(2, 2, 2, 2),
-                                      voidMath.Vec4(3, 3, 3, 3),
-                                      voidMath.Vec4(4, 4, 4, 4)])
+        mat2 = voidMath.Mat4x4(1, 1, 1, 1,
+                               2, 2, 2, 2,
+                               3, 3, 3, 3,
+                               4, 4, 4, 4)
         target = mat2
         mat1 *= mat2
         output = mat1
@@ -41,32 +41,32 @@ class testMath(unittest.TestCase):
 
     def test_XRotation(self):
         mat = voidMath.Mat4x4()
-        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 0, 0),
-                                        voidMath.Vec4(0, 0, -1, 0),
-                                        voidMath.Vec4(0, 1, 0, 0),
-                                        voidMath.Vec4(0, 0, 0, 1)])
+        rotmat = voidMath.Mat4x4(1, 0, 0, 0,
+                                 0, 0, -1, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 0, 1)
 
-        voidMath.RotateX(mat, 90)
+        mat = voidMath.RotateX(mat, 90)
         self.assertEqual(mat, rotmat)
 
     def test_YRotation(self):
         mat = voidMath.Mat4x4()
-        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(0, 0, 1, 0),
-                                        voidMath.Vec4(0, 1, 0, 0),
-                                        voidMath.Vec4(-1, 0, 0, 0),
-                                        voidMath.Vec4(0, 0, 0, 1)])
+        rotmat = voidMath.Mat4x4(0, 0, 1, 0,
+                                 0, 1, 0, 0,
+                                 -1, 0, 0, 0,
+                                 0, 0, 0, 1)
 
-        voidMath.RotateY(mat, 90)
+        mat = voidMath.RotateY(mat, 90)
         self.assertEqual(mat, rotmat)
 
     def test_ZRotation(self):
         mat = voidMath.Mat4x4()
-        rotmat = voidMath.Mat4x4(array=[voidMath.Vec4(0, -1, 0, 0),
-                                        voidMath.Vec4(1, 0, 0, 0),
-                                        voidMath.Vec4(0, 0, 1, 0),
-                                        voidMath.Vec4(0, 0, 0, 1)])
+        rotmat = voidMath.Mat4x4(0, -1, 0, 0,
+                                 1, 0, 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1)
 
-        voidMath.RotateZ(mat, 90)
+        mat = voidMath.RotateZ(mat, 90)
         self.assertEqual(mat, rotmat)
 
     def test_2x2Determinant(self):
@@ -74,9 +74,9 @@ class testMath(unittest.TestCase):
         self.assertEqual(det, -7)
 
     def test_3x3Determinant(self):
-        mat = voidMath.Mat3x3(array=[voidMath.Vec3(5, 0, 3),
-                                     voidMath.Vec3(2, 3, 5),
-                                     voidMath.Vec3(1, -2, 3)])
+        mat = voidMath.Mat3x3(5, 0, 3,
+                              2, 3, 5,
+                              1, -2, 3)
         det = mat.determinate()
         self.assertEqual(det, 74)
 
@@ -87,33 +87,33 @@ class testMath(unittest.TestCase):
         self.assertEqual(mat3, matConv)
 
     def test_4x4Determinant(self):
-        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 4, -6),
-                                     voidMath.Vec4(2, 5, 0, 3),
-                                     voidMath.Vec4(-1, 2, 3, 5),
-                                     voidMath.Vec4(2, 1, -2, 3)])
+        mat = voidMath.Mat4x4(1, 0, 4, -6,
+                              2, 5, 0, 3,
+                              -1, 2, 3, 5,
+                              2, 1, -2, 3)
         det = mat.determinate()
         self.assertEqual(det, 318)
 
     def test_4x4Transpose(self):
-        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 2, 3, 4),
-                                     voidMath.Vec4(5, 6, 7, 8),
-                                     voidMath.Vec4(9, 10, 11, 12),
-                                     voidMath.Vec4(13, 14, 15, 16)])
+        mat = voidMath.Mat4x4(1, 2, 3, 4,
+                              5, 6, 7, 8,
+                              9, 10, 11, 12,
+                              13, 14, 15, 16)
 
         mat = mat.transpose()
 
-        otherMat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 5, 9, 13),
-                                          voidMath.Vec4(2, 6, 10, 14),
-                                          voidMath.Vec4(3, 7, 11, 15),
-                                          voidMath.Vec4(4, 8, 12, 16)])
+        otherMat = voidMath.Mat4x4(1, 5, 9, 13,
+                                   2, 6, 10, 14,
+                                   3, 7, 11, 15,
+                                   4, 8, 12, 16)
 
         self.assertEqual(mat, otherMat)
 
     def test_4x4Inverse(self):
-        mat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 2, 3, 4),
-                                     voidMath.Vec4(5, 6, 7, 8),
-                                     voidMath.Vec4(9, 10, 11, 12),
-                                     voidMath.Vec4(13, 14, 15, 16)])
+        mat = voidMath.Mat4x4(1, 1, 1, -1,
+                              1, 1, -1, 1,
+                              1, -1, 1, 1,
+                              -1, 1, 1, 1)
 
         # Get inverse
         otherMat = mat.inverse()
@@ -136,10 +136,10 @@ class testGraphics(unittest.TestCase):
     def test_TransformMove(self):
         transform = VP.Transform()
         translate = voidMath.Vec4(1, 0, 0, 1)
-        realMat = voidMath.Mat4x4(array=[voidMath.Vec4(1, 0, 0, 0),
-                                         voidMath.Vec4(0, 1, 0, 0),
-                                         voidMath.Vec4(0, 0, 1, 0),
-                                         voidMath.Vec4(1, 0, 0, 1)])
+        realMat = voidMath.Mat4x4(voidMath.Vec4(1, 0, 0, 0),
+                                  voidMath.Vec4(0, 1, 0, 0),
+                                  voidMath.Vec4(0, 0, 1, 0),
+                                  voidMath.Vec4(1, 0, 0, 1))
         transform.Translate(translate)
         self.assertEqual(transform.Matrix, realMat)
         self.assertEqual(transform.Position(), translate)
