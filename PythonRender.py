@@ -25,11 +25,11 @@ def Main():
     primApp = application(root)
     root.protocol("WM_DELETE_WINDOW", primApp.onWindowClose)
     primeScene = VP.Scene()
-    primeScene.Camera = VP.Camera(position=Vec4(0, 0, 5))
+    primeScene.Camera = VP.Camera(position=Vec4(0, 0, 5, 1))
     primeScene.gameObjects.clear()
     cubeObj = VP.gameObject()
     cubeObj.myMesh = VP.CreateCube()
-    RotateY(cubeObj.transform.Matrix, 45.0)
+    RotateY(cubeObj.transform.Matrix, 15.0)
     primeScene.addObject(cubeObj)
 
     # Setup inputs

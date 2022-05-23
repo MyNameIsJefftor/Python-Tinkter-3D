@@ -24,11 +24,13 @@ class Transform():
 
 
 class Camera:
-    def __init__(self, position=Math3D.Vec4(),
+    def __init__(self, position=0,
                  nearPlane=1, farPlane=10) -> None:
 
+        if not isinstance(position, Math3D.Vec4):
+            position = Math3D.Vec4()
+
         trans = Transform()
-        trans.Position = position
         trans.Matrix = Math3D.Mat4x4()
         trans.Matrix[3] = position
         self.transform = trans
@@ -36,27 +38,30 @@ class Camera:
         self.far = farPlane
 
     def MovePosX(self):
-        self.transform.Matrix[3] += Math3D.Vec4(x=0.1)
+        self.transform.Matrix[3] *= Math3D.Mat4x4(D0=1)
 
     def MoveNegX(self):
-        self.transform.Matrix[3] += Math3D.Vec4(x=-0.1)
+        self.transform.Matrix[3] *= Math3D.Mat4x4(D0=-1)
 
     def MovePosY(self):
-        self.transform.Matrix[3] += Math3D.Vec4(y=0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(y=1)
 
     def MoveNegY(self):
-        self.transform.Matrix[3] += Math3D.Vec4(y=-0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(y=-1)
 
     def MovePosZ(self):
-        self.transform.Matrix[3] += Math3D.Vec4(z=0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(z=1)
 
     def MoveNegZ(self):
-        self.transform.Matrix[3] += Math3D.Vec4(z=-0.1)
+        self.transform.Matrix[3] += Math3D.Vec4(z=-1)
 
-    def createLookat(self,
-                     target: Math3D.Vec4 = Math3D.Vec4(0, 0, 1, 0)) -> Math3D.Mat4x4:
+    def createLookat(self, target=0) -> Math3D.Mat4x4:
+
+        if not isinstance(target, Math3D.Vec4):
+            target = self.transform.Position()+(Math3D.Vec4(z=-1))
+
         # Look
-        zAxis = (self.transform.Position - target).normalize()
+        zAxis = (self.transform.Position() - target).normalize()
 
         # Right
         xAxis = (Math3D.cross(Math3D.Vec4(0, 1, 0, 0), zAxis)).normalize()
@@ -64,13 +69,13 @@ class Camera:
         # Up
         yAxis = Math3D.Vec4(0, 1, 0, 0)
 
-        output = Math3D.Mat4x4(Math3D.Vec4(xAxis.x(), yAxis.x(), zAxis.x(), 0),
-                               Math3D.Vec4(xAxis.y(), yAxis.y(), zAxis.y(), 0),
-                               Math3D.Vec4(xAxis.z(), yAxis.z(), zAxis.z(), 0),
-                               Math3D.Vec4(Math3D.dot(xAxis, self.transform.Position),
-                                           Math3D.dot(yAxis, self.transform.Position),
-                                           Math3D.dot(zAxis, self.transform.Position),
-                                           1))
+        output = Math3D.Mat4x4(xAxis.x(), yAxis.x(), zAxis.x(), 0,
+                               xAxis.y(), yAxis.y(), zAxis.y(), 0,
+                               xAxis.z(), yAxis.z(), zAxis.z(), 0,
+                               Math3D.dot(xAxis, self.transform.Position()),
+                               Math3D.dot(yAxis, self.transform.Position()),
+                               Math3D.dot(zAxis, self.transform.Position()),
+                               1)
 
         return (output)
 
@@ -81,10 +86,10 @@ class Camera:
         xScale = yScale * aspectRatio
         extraVal1 = (self.far/(self.far - self.near))
         extraVal2 = ((self.far*self.near)/(self.far-self.near))
-        output = Math3D.Mat4x4(Math3D.Vec4(xScale, 0, 0, 0),
-                               Math3D.Vec4(0, yScale, 0, 0),
-                               Math3D.Vec4(0, 0, extraVal1, 1),
-                               Math3D.Vec4(0, 0, extraVal2, 0))
+        output = Math3D.Mat4x4(xScale, 0, 0, 0,
+                               0, yScale, 0, 0,
+                               0, 0, extraVal1, 1,
+                               0, 0, extraVal2, 0)
 
         return output
 
@@ -173,7 +178,7 @@ def Draw(scene: Scene) -> bool:
         scene.Refresh = False
         for point in gObj.myMesh.points:
             newPoint = point*gObj.transform.Matrix
-            newPoint = newPoint*scene.Camera.createLookat().inverse()
+            newPoint = newPoint*scene.Camera.createLookat()
             newPoint = newPoint*scene.Camera.createProjMat()
             if newPoint[3] != 1:
                 newPoint[0] = newPoint[0]/newPoint[3]
