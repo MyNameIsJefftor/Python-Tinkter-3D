@@ -14,13 +14,25 @@ class Mesh():
 class Transform():
     def __init__(self, parent=None):
         self.parent = parent
-        self.Matrix = Math3D.Mat4x4()
+        self.position = Math3D.Vec4()
+        self.rotation = Math3D.Vec4()
+        self.scale = Math3D.Vec4(1, 1, 1, 1)
 
     def Translate(self, vec: Math3D.Vec4) -> None:
-        self.Matrix[3] = vec
+        self.position += vec
 
     def Position(self) -> Math3D.Vec4:
-        return self.Matrix[3]
+        return self.position
+
+    def Matrix(self) -> Math3D.Mat4x4:
+        posMatrix = Math3D.Mat4x4(D0=self.position.x(), D1=self.position.y(), D2=self.position.z())
+        scaleMatrix = Math3D.Mat4x4(A0=self.scale.x(), B1=self.scale.y(), C2=self.scale.z())
+        output = posMatrix * scaleMatrix
+        output = Math3D.RotateX(output, self.rotation.x())
+        output = Math3D.RotateY(output, self.rotation.y())
+        output = Math3D.RotateZ(output, self.rotation.z())
+
+        return output
 
 
 class Camera:
@@ -38,22 +50,22 @@ class Camera:
         self.far = farPlane
 
     def MovePosX(self):
-        self.transform.Matrix[3] *= Math3D.Mat4x4(D0=1)
+        self.transform.Translate(Math3D.Vec4(x=1))
 
     def MoveNegX(self):
-        self.transform.Matrix[3] *= Math3D.Mat4x4(D0=-1)
+        self.transform.Translate(Math3D.Vec4(x=-1))
 
     def MovePosY(self):
-        self.transform.Matrix[3] += Math3D.Vec4(y=1)
+        self.transform.Translate(Math3D.Vec4(y=1))
 
     def MoveNegY(self):
-        self.transform.Matrix[3] += Math3D.Vec4(y=-1)
+        self.transform.Translate(Math3D.Vec4(y=-1))
 
     def MovePosZ(self):
-        self.transform.Matrix[3] += Math3D.Vec4(z=1)
+        self.transform.Translate(Math3D.Vec4(z=1))
 
     def MoveNegZ(self):
-        self.transform.Matrix[3] += Math3D.Vec4(z=-1)
+        self.transform.Translate(Math3D.Vec4(z=-1))
 
     def createLookat(self, target=0) -> Math3D.Mat4x4:
 
@@ -177,7 +189,7 @@ def Draw(scene: Scene) -> bool:
         gObj.myMesh.ProjectedPoints.clear()
         scene.Refresh = False
         for point in gObj.myMesh.points:
-            newPoint = point*gObj.transform.Matrix
+            newPoint = point*gObj.transform.Matrix()
             newPoint = newPoint*scene.Camera.createLookat()
             newPoint = newPoint*scene.Camera.createProjMat()
             if newPoint[3] != 1:
